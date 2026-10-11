@@ -30,8 +30,9 @@ ACTUALIZAR (cuando recibas una versión nueva)
 --------------------------------------------
  - Teléfono: abre el nuevo "PcHub.apk" igual que la primera vez. Se instala
    ENCIMA de la anterior: no hay que desinstalar nada y no pierdes el PIN.
- - PC: cierra PC Hub (clic derecho en el ícono -> Salir), abre el nuevo
-   "PcHub.Agent.exe" y elige "Sí" a instalar. Reemplaza la versión anterior.
+ - PC: abre el nuevo "PcHub.Agent.exe" y elige "Sí" cuando avise que hay una
+   versión nueva. Cierra la anterior solo, la reemplaza y la vuelve a abrir.
+   No pierdes el PIN ni los teléfonos vinculados.
 
 PASO 3: conectar
 ----------------

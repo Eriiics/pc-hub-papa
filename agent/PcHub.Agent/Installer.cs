@@ -33,10 +33,53 @@ public static class Installer
 
     /// <summary>¿Es una carpeta publicada (con todo lo necesario) y no una compilación de desarrollo?</summary>
     public static bool IsPublishedBuild =>
-        !AppContext.BaseDirectory.Contains(@"in\", StringComparison.OrdinalIgnoreCase)
+        !AppContext.BaseDirectory.Contains(@"\bin\", StringComparison.OrdinalIgnoreCase)
         && !AppContext.BaseDirectory.Contains(@"\obj\", StringComparison.OrdinalIgnoreCase);
 
     public static bool IsInstalled => File.Exists(InstalledExe);
+
+    /// <summary>Versión de la copia ya instalada, o null si no hay.</summary>
+    public static Version? InstalledVersion
+    {
+        get
+        {
+            try { return IsInstalled && Version.TryParse(FileVersionInfo.GetVersionInfo(InstalledExe).FileVersion, out var v) ? v : null; }
+            catch { return null; }
+        }
+    }
+
+    /// <summary>
+    /// Primer uso o actualización al abrir el .exe de la carpeta descargada: pregunta una sola vez y reemplaza la
+    /// copia anterior (la configuración se conserva). Devuelve true si el programa debe terminar aquí.
+    /// </summary>
+    public static bool OfferInstallOrUpdate()
+    {
+        if (RunningFromInstall || !IsPublishedBuild) return false;
+        var installed = InstalledVersion;
+        if (installed == null)
+        {
+            if (MessageBox.Show("¡Bienvenido a PC Hub!\n\n¿Quieres instalarlo en este PC? Quedará en el menú Inicio y se abrirá solo al encender el PC.",
+                    AppName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return false;
+            InstallFromCurrent();
+            return true;
+        }
+        var current = typeof(Installer).Assembly.GetName().Version ?? new Version(0, 0, 0);
+        var cur = new Version(current.Major, current.Minor, Math.Max(0, current.Build));
+        var inst = new Version(installed.Major, installed.Minor, Math.Max(0, installed.Build));
+        if (cur > inst)
+        {
+            if (MessageBox.Show($"Hay una versión nueva de PC Hub ({cur}). Tienes la {inst}.\n\n¿Actualizar ahora? Tu PIN y tus teléfonos vinculados se conservan.",
+                    AppName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                InstallFromCurrent();
+                return true;
+            }
+            return false;
+        }
+        // Ya está instalado (misma versión o más nueva): se abre la copia instalada en vez de duplicarla
+        Process.Start(new ProcessStartInfo(InstalledExe) { UseShellExecute = true, WorkingDirectory = InstallDir });
+        return true;
+    }
 
     /// <summary>¿Este proceso es la copia instalada (y no "dotnet run" desde el código)?</summary>
     public static bool RunningFromInstall =>
@@ -85,7 +128,7 @@ public static class Installer
             {
                 var rel = Path.GetRelativePath(source, file);
                 if (rel.EndsWith(".pdb", StringComparison.OrdinalIgnoreCase)) continue;
-                File.Copy(file, Path.Combine(InstallDir, rel), overwrite: true);
+                CopyWithRetry(file, Path.Combine(InstallDir, rel));
             }
             CreateShortcut(StartMenuShortcut, InstalledExe, "Controla tu PC desde el teléfono");
             SetStartup(true);
@@ -96,6 +139,16 @@ public static class Installer
         {
             Log.Error("No se pudo instalar", ex);
             MessageBox.Show("No se pudo instalar PC Hub:\n\n" + ex.Message, AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+    }
+
+    // Tras cerrar la copia vieja, Windows puede tardar un instante en soltar sus archivos
+    private static void CopyWithRetry(string from, string to)
+    {
+        for (int i = 0; ; i++)
+        {
+            try { File.Copy(from, to, overwrite: true); return; }
+            catch (IOException) when (i < 10) { System.Threading.Thread.Sleep(500); }
         }
     }
 

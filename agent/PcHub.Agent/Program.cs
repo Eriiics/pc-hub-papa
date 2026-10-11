@@ -30,6 +30,9 @@ internal static class Program
         }
         StartedWithWindows = args.Contains("--startup", StringComparer.OrdinalIgnoreCase);
 
+        // Instalar o actualizar desde la carpeta descargada va ANTES del candado: la copia vieja puede estar corriendo
+        if (!StartedWithWindows && Installer.OfferInstallOrUpdate()) return;
+
         // Al reiniciar tras una actualización, la copia anterior puede tardar un momento en cerrarse
         using var mutex = new Mutex(false, "PcHub.Agent.Singleton");
         bool acquired;
@@ -50,16 +53,6 @@ internal static class Program
             Application.ThreadException += (_, e) => Log.Error("Excepción en UI", e.Exception);
 
             Installer.EnsureRegistered();
-
-            // Primera vez desde la carpeta descargada: ofrecer instalar (copia a Programs, menú Inicio y arranque con Windows)
-            if (!Installer.RunningFromInstall && !Installer.IsInstalled && Installer.IsPublishedBuild
-                && MessageBox.Show("¡Bienvenido a PC Hub!\n\n¿Quieres instalarlo en este PC? Quedará en el menú Inicio y se abrirá solo al encender el PC.",
-                    "PC Hub", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                mutex.ReleaseMutex();
-                Installer.InstallFromCurrent();
-                return;
-            }
 
             var config = ConfigStore.Load();
             Application.Run(new TrayApp(config));
