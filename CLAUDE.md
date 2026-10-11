@@ -16,7 +16,7 @@ una persona que sabe usar el computador y el teléfono pero no programa. Usa muc
 - Gradle necesita JDK 17 o 21 (con JDK 25 falla). `Revisar-requisitos.ps1` (que llama `Crear-paquete.ps1`) lo busca y explica qué falta.
 - Cada módulo del agente es una clase en `Modules/`. Las rutas del protocolo se registran en `Hub.RegisterRoutes()` con `On("modulo.accion", …)`.
 - En Android, cada pantalla es un `@Composable` en `ui/`. La navegación está en `ui/Navigation.kt` (enum `Screen`). Los ajustes persistentes van en `Prefs.kt`.
-- Estilo visual: neón + vidrio. Usa `GlassCard`, `NeonButton`, `NeonTile`, `SegmentedTabs`, `Modifier.glass` y los colores de `Neon` (de `ui/Theme.kt` y `ui/Glass.kt`). Para un brillo de color usa `Modifier.neonShadow`, nunca `shadow` directo.
+- Estilo visual: estilo Samsung One UI (fondo negro, tarjetas grises de esquinas muy redondeadas, botones en píldora, acento azul, sin resplandores). Usa `GlassCard`, `NeonButton`, `NeonTile`, `SegmentedTabs`, `Modifier.glass` y los colores de `Neon` (de `ui/Theme.kt` y `ui/Glass.kt`); los nombres vienen de la versión neón, pero ahora dibujan el estilo plano. No agregues sombras de color ni degradados.
 - Simple primero: nada de pantallas ni opciones técnicas que el usuario no necesite.
 
 ## Qué se quitó respecto a la versión de Chacho

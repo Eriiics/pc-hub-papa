@@ -41,7 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shape
@@ -63,72 +63,34 @@ import kotlin.math.sin
 
 // ============================================================ fondo
 
-/** Fondo oscuro con manchas de luz neón que se mueven lento (los paneles de vidrio se ven encima). */
+/** Fondo negro liso (como One UI en modo oscuro); las tarjetas grises se ven encima. */
 @Composable
 fun NeonBackground(modifier: Modifier = Modifier) {
-    val t = rememberInfiniteTransition(label = "bg")
-    val phase by t.animateFloat(
-        initialValue = 0f,
-        targetValue = (2 * Math.PI).toFloat(),
-        animationSpec = infiniteRepeatable(tween(26_000, easing = LinearEasing), RepeatMode.Restart),
-        label = "phase",
-    )
-    // Se leen fuera del Canvas para que cambiar la intensidad en Ajustes redibuje el fondo
-    val k = 0.45f + 0.55f * Neon.glow
-    val violet = Neon.Violet
-    val cyan = Neon.Cyan
-    val magenta = Neon.Magenta
-    Canvas(modifier.fillMaxSize().background(Neon.Bg)) {
-        val w = size.width
-        val h = size.height
-        fun blob(color: Color, cx: Float, cy: Float, r: Float) {
-            drawCircle(
-                brush = Brush.radialGradient(listOf(color, Color.Transparent), center = Offset(cx, cy), radius = r),
-                radius = r,
-                center = Offset(cx, cy),
-            )
-        }
-        blob(violet.copy(alpha = 0.34f * k), w * (0.18f + 0.10f * cos(phase)), h * (0.14f + 0.05f * sin(phase)), w * 0.85f)
-        blob(cyan.copy(alpha = 0.20f * k), w * (0.92f + 0.08f * sin(phase * 1.3f)), h * (0.48f + 0.08f * cos(phase)), w * 0.75f)
-        blob(magenta.copy(alpha = 0.18f * k), w * (0.25f + 0.12f * sin(phase * 0.7f)), h * (0.92f + 0.04f * cos(phase * 1.1f)), w * 0.80f)
-    }
+    Box(modifier.fillMaxSize().background(Neon.Bg))
 }
 
 // ============================================================ vidrio
 
 /**
- * Panel de vidrio: relleno translúcido con degradado, borde fino iluminado arriba y, opcional, brillo neón.
- * Sobre NeonBackground da el efecto "glass".
+ * Tarjeta lisa de esquinas muy redondeadas (estilo One UI). El nombre se conserva por compatibilidad:
+ * [glow] ya no dibuja resplandor, [tint] tiñe suavemente la tarjeta y [strong] la aclara un poco.
  */
 fun Modifier.glass(
-    shape: Shape = RoundedCornerShape(24.dp),
+    shape: Shape = RoundedCornerShape(28.dp),
     glow: Color? = null,
     strong: Boolean = false,
     tint: Color? = null,
 ): Modifier {
-    val top = if (strong) 0.15f else 0.085f
-    val bottom = if (strong) 0.07f else 0.035f
-    val fill = Brush.verticalGradient(
-        listOf(
-            (tint ?: Color.White).copy(alpha = if (tint != null) top * 1.6f else top),
-            (tint ?: Color.White).copy(alpha = if (tint != null) bottom * 1.6f else bottom),
-        )
-    )
-    val edge = Brush.linearGradient(
-        listOf(Color.White.copy(alpha = 0.30f), Color.White.copy(alpha = 0.05f), (glow ?: Color.White).copy(alpha = if (glow != null) 0.12f + 0.33f * Neon.glow else 0.10f))
-    )
-    return this
-        .then(if (glow != null) Modifier.neonShadow(22.dp, shape, glow) else Modifier)
-        .clip(shape)
-        .background(fill)
-        .border(1.dp, edge, shape)
+    val base = if (strong) Neon.CardStrong else Neon.Card
+    val fill = if (tint != null) tint.copy(alpha = 0.16f).compositeOver(base) else base
+    return this.clip(shape).background(fill)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(24.dp),
+    shape: Shape = RoundedCornerShape(28.dp),
     glow: Color? = null,
     strong: Boolean = false,
     tint: Color? = null,
@@ -166,7 +128,7 @@ fun NeonTile(
     Box(
         modifier
             .aspectRatio(1f)
-            .glass(RoundedCornerShape(22.dp), glow = if (highlighted) accent else null, tint = if (highlighted) accent else null)
+            .glass(RoundedCornerShape(28.dp), tint = if (highlighted) accent else null)
             .combinedClickable(
                 onClick = { haptic(false); onClick() },
                 onLongClick = onLongClick?.let { { haptic(true); it() } },
@@ -176,9 +138,9 @@ fun NeonTile(
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Box(
                 Modifier
-                    .size(44.dp)
+                    .size(52.dp)
                     .clip(CircleShape)
-                    .background(Brush.radialGradient(listOf(accent.copy(alpha = 0.32f), Color.Transparent))),
+                    .background(accent.copy(alpha = 0.20f)),
                 contentAlignment = Alignment.Center,
             ) {
                 when {
@@ -226,9 +188,8 @@ fun NeonIconButton(
             .size(size)
             .then(
                 if (filled) Modifier
-                    .neonShadow(18.dp, CircleShape, accent)
                     .clip(CircleShape)
-                    .background(Brush.linearGradient(listOf(accent, accent.copy(alpha = 0.65f))))
+                    .background(accent)
                 else Modifier.glass(CircleShape)
             )
             .clickable(enabled = enabled) { haptic(false); onClick() },
@@ -237,7 +198,7 @@ fun NeonIconButton(
         Icon(
             icon,
             contentDescription = contentDescription,
-            tint = if (filled) Neon.Bg else if (enabled) accent else Neon.TextFaint,
+            tint = if (filled) Color.White else if (enabled) accent else Neon.TextFaint,
             modifier = Modifier.size(size * 0.5f),
         )
     }
@@ -255,16 +216,15 @@ fun NeonButton(
     onClick: () -> Unit,
 ) {
     val haptic = rememberHaptic()
-    val shape = RoundedCornerShape(18.dp)
+    val shape = RoundedCornerShape(50)
     Row(
         modifier
-            .height(50.dp)
+            .height(52.dp)
             .then(
                 if (outlined || !enabled) Modifier.glass(shape)
                 else Modifier
-                    .neonShadow(16.dp, shape, accent)
                     .clip(shape)
-                    .background(Brush.horizontalGradient(listOf(accent, Neon.Violet)))
+                    .background(accent)
             )
             .clickable(enabled = enabled) { haptic(false); onClick() }
             .padding(horizontal = 18.dp),
@@ -274,7 +234,7 @@ fun NeonButton(
         val color = when {
             !enabled -> Neon.TextFaint
             outlined -> accent
-            else -> Neon.Bg
+            else -> Color.White
         }
         if (icon != null) {
             Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
@@ -291,7 +251,7 @@ fun SegmentedTabs(options: List<String>, selected: Int, modifier: Modifier = Mod
     Row(modifier.glass(RoundedCornerShape(50)).padding(4.dp)) {
         options.forEachIndexed { i, label ->
             val active = i == selected
-            val bg by animateColorAsState(if (active) Neon.Cyan.copy(alpha = 0.22f) else Color.Transparent, label = "seg")
+            val bg by animateColorAsState(if (active) Neon.Cyan else Color.Transparent, label = "seg")
             Box(
                 Modifier
                     .weight(1f)
@@ -303,7 +263,7 @@ fun SegmentedTabs(options: List<String>, selected: Int, modifier: Modifier = Mod
             ) {
                 Text(
                     label,
-                    color = if (active) Neon.Cyan else Neon.TextDim,
+                    color = if (active) Color.White else Neon.TextDim,
                     fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
                     style = MaterialTheme.typography.labelLarge,
                 )
@@ -315,8 +275,8 @@ fun SegmentedTabs(options: List<String>, selected: Int, modifier: Modifier = Mod
 /** Título de sección en mayúsculas. */
 @Composable
 fun SectionTitle(text: String, modifier: Modifier = Modifier, trailing: (@Composable () -> Unit)? = null) {
-    Row(modifier.fillMaxWidth().padding(start = 4.dp, top = 18.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(text.uppercase(), style = SectionStyle, modifier = Modifier.weight(1f))
+    Row(modifier.fillMaxWidth().padding(start = 8.dp, top = 20.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(text, style = SectionStyle, modifier = Modifier.weight(1f))
         trailing?.invoke()
     }
 }

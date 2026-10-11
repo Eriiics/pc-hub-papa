@@ -103,13 +103,6 @@ fun SettingsScreen() {
             }
         }
 
-        // ---------- apariencia ----------
-        SectionTitle("Apariencia")
-        GlassCard(Modifier.fillMaxWidth(), padding = 12.dp) {
-            SliderRow("Intensidad del neón (colores y brillo)", Prefs.neonIntensity, 0f..1f, decimals = 2) { Prefs.neonIntensity = it }
-            Text("Más bajo = colores más suaves y menos resplandor.", style = MaterialTheme.typography.labelSmall, color = Neon.TextFaint)
-        }
-
         // ---------- touchpad ----------
         SectionTitle("Touchpad")
         GlassCard(Modifier.fillMaxWidth(), padding = 12.dp) {

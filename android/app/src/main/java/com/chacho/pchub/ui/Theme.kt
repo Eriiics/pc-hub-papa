@@ -16,15 +16,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-/** Colores neón originales (máxima intensidad). En la UI se usan los de [Neon], que respetan el ajuste de intensidad. */
+/** Colores de acento (estilo One UI de Samsung: azul, menta, ámbar...). En la UI se usan los de [Neon]. */
 object NeonRaw {
-    val Cyan = Color(0xFF00E5FF)
-    val Violet = Color(0xFF9B5CFF)
-    val Magenta = Color(0xFFFF2BD6)
-    val Lime = Color(0xFFB6FF3B)
-    val Amber = Color(0xFFFFB547)
-    val Red = Color(0xFFFF4D6D)
-    val TextDim = Color(0xFFA9A3C2)
+    val Cyan = Color(0xFF3E91FF)
+    val Violet = Color(0xFF8E86FF)
+    val Magenta = Color(0xFFFF6FA5)
+    val Lime = Color(0xFF3DD68C)
+    val Amber = Color(0xFFFFB84D)
+    val Red = Color(0xFFFF5D5D)
+    val TextDim = Color(0xFFA8A8AE)
 }
 
 /**
@@ -32,30 +32,27 @@ object NeonRaw {
  * (1 = colores y brillo a tope, como la primera versión; por defecto más suave).
  */
 object Neon {
-    val Bg = Color(0xFF07060D)
-    val BgDeep = Color(0xFF0C0A16)
+    val Bg = Color(0xFF000000)
+    val BgDeep = Color(0xFF0A0A0B)
+    /** Tarjetas: gris casi negro, como One UI en modo oscuro. */
+    val Card = Color(0xFF1C1C1F)
+    val CardStrong = Color(0xFF28282C)
     val Cyan: Color get() = tone(NeonRaw.Cyan)
     val Violet: Color get() = tone(NeonRaw.Violet)
     val Magenta: Color get() = tone(NeonRaw.Magenta)
     val Lime: Color get() = tone(NeonRaw.Lime)
     val Amber: Color get() = tone(NeonRaw.Amber)
     val Red: Color get() = tone(NeonRaw.Red)
-    val Text = Color(0xFFF1EEFF)
+    val Text = Color(0xFFF4F4F6)
     val TextDim = NeonRaw.TextDim
-    val TextFaint = Color(0xFF6E6889)
+    val TextFaint = Color(0xFF76767C)
     /** Fondo de los diálogos y menús (opaco, para que se lean bien). */
-    val Panel = Color(0xFF161327)
+    val Panel = Color(0xFF232326)
 
-    /** 0..1, cuánto brillo (sombras de color, manchas del fondo, bordes iluminados). */
-    val glow: Float get() = 0.15f + 0.85f * Prefs.neonIntensity
+    /** Sin resplandor: el estilo Samsung es plano y limpio. */
+    val glow: Float get() = 0f
 
-    /** Acerca el color a un gris de la misma luminosidad según la intensidad elegida. */
-    fun tone(c: Color): Color {
-        val s = 0.35f + 0.65f * Prefs.neonIntensity
-        val l = 0.299f * c.red + 0.587f * c.green + 0.114f * c.blue
-        fun ch(v: Float) = (l + (v - l) * s).coerceIn(0f, 1f)
-        return Color(ch(c.red), ch(c.green), ch(c.blue), c.alpha)
-    }
+    fun tone(c: Color): Color = c
 }
 
 /** Sombra de color (el "brillo" neón), escalada por la intensidad elegida. */
@@ -69,28 +66,28 @@ fun Modifier.neonShadow(elevation: Dp, shape: Shape, color: Color): Modifier {
 
 private fun scheme() = darkColorScheme(
     primary = Neon.Cyan,
-    onPrimary = Color(0xFF00141A),
-    primaryContainer = Color(0xFF0C3A46),
-    onPrimaryContainer = Color(0xFFB8F6FF),
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFF173A66),
+    onPrimaryContainer = Color(0xFFD6E6FF),
     secondary = Neon.Violet,
-    onSecondary = Color(0xFF16062E),
-    secondaryContainer = Color(0xFF2C1A55),
-    onSecondaryContainer = Color(0xFFE6DAFF),
+    onSecondary = Color.White,
+    secondaryContainer = Color(0xFF2A2850),
+    onSecondaryContainer = Color(0xFFE6E4FF),
     tertiary = Neon.Magenta,
-    onTertiary = Color(0xFF2A0022),
+    onTertiary = Color.White,
     background = Neon.Bg,
     onBackground = Neon.Text,
     surface = Neon.Bg,
     onSurface = Neon.Text,
-    surfaceVariant = Color(0xFF221E36),
+    surfaceVariant = Color(0xFF2A2A2E),
     onSurfaceVariant = Neon.TextDim,
     surfaceContainerLowest = Neon.Bg,
-    surfaceContainerLow = Color(0xFF110E1D),
-    surfaceContainer = Color(0xFF141124),
+    surfaceContainerLow = Color(0xFF111113),
+    surfaceContainer = Color(0xFF18181B),
     surfaceContainerHigh = Neon.Panel,
-    surfaceContainerHighest = Color(0xFF221E36),
-    outline = Color(0xFF3B3557),
-    outlineVariant = Color(0xFF2A2540),
+    surfaceContainerHighest = Color(0xFF2E2E32),
+    outline = Color(0xFF45454B),
+    outlineVariant = Color(0xFF2C2C30),
     error = Neon.Red,
     onError = Color(0xFF2B000A),
 )
@@ -98,22 +95,21 @@ private fun scheme() = darkColorScheme(
 private val Base = Typography()
 
 private val Type = Base.copy(
-    displaySmall = Base.displaySmall.copy(fontWeight = FontWeight.Black, letterSpacing = (-0.5).sp),
-    headlineLarge = Base.headlineLarge.copy(fontWeight = FontWeight.Black, letterSpacing = (-0.5).sp),
-    headlineMedium = Base.headlineMedium.copy(fontWeight = FontWeight.ExtraBold, letterSpacing = (-0.3).sp),
-    headlineSmall = Base.headlineSmall.copy(fontWeight = FontWeight.Bold),
+    displaySmall = Base.displaySmall.copy(fontWeight = FontWeight.Bold),
+    headlineLarge = Base.headlineLarge.copy(fontWeight = FontWeight.Bold),
+    headlineMedium = Base.headlineMedium.copy(fontWeight = FontWeight.Bold),
+    headlineSmall = Base.headlineSmall.copy(fontWeight = FontWeight.SemiBold),
     titleLarge = Base.titleLarge.copy(fontWeight = FontWeight.Bold),
     titleMedium = Base.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-    labelSmall = Base.labelSmall.copy(letterSpacing = 1.sp, fontWeight = FontWeight.SemiBold),
+    labelSmall = Base.labelSmall.copy(letterSpacing = 0.2.sp, fontWeight = FontWeight.Medium),
 )
 
 @Composable
 fun PcHubTheme(content: @Composable () -> Unit) {
-    val intensity = Prefs.neonIntensity
-    val colors = remember(intensity) { scheme() }
+    val colors = remember { scheme() }
     MaterialTheme(colorScheme = colors, typography = Type, content = content)
 }
 
 /** Texto en mayúsculas pequeño para encabezados de sección. */
 val SectionStyle: TextStyle
-    @Composable get() = MaterialTheme.typography.labelSmall.copy(color = Neon.TextDim)
+    @Composable get() = MaterialTheme.typography.titleSmall.copy(color = Neon.Cyan, fontWeight = FontWeight.SemiBold)

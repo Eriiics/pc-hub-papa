@@ -212,7 +212,6 @@ private fun TopBar(nav: Nav, reconnecting: Boolean, kbOpen: Boolean, onKeyboard:
                     Box(
                         Modifier
                             .size(7.dp)
-                            .neonShadow(6.dp, CircleShape, Neon.Lime)
                             .clip(CircleShape)
                             .background(if (reconnecting) Neon.Amber else Neon.Lime)
                     )
@@ -258,10 +257,9 @@ private fun BottomBar(nav: Nav) {
     Row(
         Modifier
             .navigationBarsPadding()
-            .padding(start = 14.dp, end = 14.dp, top = 6.dp, bottom = 10.dp)
             .fillMaxWidth()
-            .glass(RoundedCornerShape(28.dp), strong = true)
-            .padding(vertical = 6.dp, horizontal = 4.dp),
+            .glass(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+            .padding(top = 8.dp, bottom = 6.dp, start = 4.dp, end = 4.dp),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -281,9 +279,8 @@ private fun BottomBar(nav: Nav) {
                         .size(width = 46.dp, height = 30.dp)
                         .then(
                             if (active) Modifier
-                                .neonShadow(14.dp, RoundedCornerShape(50), Neon.Cyan)
                                 .clip(RoundedCornerShape(50))
-                                .background(Neon.Cyan.copy(alpha = 0.16f))
+                                .background(Neon.Cyan.copy(alpha = 0.22f))
                             else Modifier
                         ),
                     contentAlignment = Alignment.Center,
