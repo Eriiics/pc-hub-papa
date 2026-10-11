@@ -2,7 +2,9 @@
 #   - PcHub-PC\   el programa del PC (trae todo lo necesario, no hace falta instalar .NET)
 #   - PcHub.apk   la app del teléfono
 #   - LEEME.txt   los pasos para tu papá
-# Uso: clic derecho en este archivo → "Ejecutar con PowerShell"
+# Además deja el .zip con la versión en el nombre (PcHub-Paquete-1.0.0.zip) listo para pasar.
+# Uso: clic derecho en este archivo → "Ejecutar con PowerShell"  (con -SinAbrir no abre la carpeta al terminar)
+param([switch]$SinAbrir)
 $ErrorActionPreference = 'Stop'
 $raiz = $PSScriptRoot
 $salida = Join-Path $raiz 'PcHub-Paquete'
@@ -33,7 +35,21 @@ Copy-Item (Join-Path $raiz 'android\app\build\outputs\apk\release\app-release.ap
 
 Write-Host "3/3 Escribiendo las instrucciones…" -ForegroundColor Cyan
 Copy-Item (Join-Path $raiz 'LEEME-PAPA.txt') (Join-Path $salida 'LEEME.txt')
+@"
+PC Hub ${version}: cómo actualizar (2 minutos)
+=============================================
+1. Teléfono: abre PcHub.apk. Se instala encima de la anterior, sin desinstalar.
+2. PC: abre PcHub-PC\PcHub.Agent.exe y elige "Sí" cuando diga que hay una versión nueva.
+   Cierra la anterior, la reemplaza y la abre sola.
+Tu PIN y tus teléfonos vinculados se conservan.
+Si algo falla, mira LEEME.txt.
+"@ | Set-Content (Join-Path $salida 'ACTUALIZAR.txt') -Encoding UTF8
+
+$zip = Join-Path $raiz "PcHub-Paquete-$version.zip"
+if (Test-Path $zip) { Remove-Item $zip -Force }
+Compress-Archive -Path (Join-Path $salida '*') -DestinationPath $zip
 
 $mb = [math]::Round(((Get-ChildItem $salida -Recurse -File | Measure-Object Length -Sum).Sum) / 1MB)
 Write-Host "`nListo: $salida ($mb MB, versión $version)" -ForegroundColor Green
-Start-Process explorer.exe $salida
+Write-Host "Para pasar: $zip" -ForegroundColor Green
+if (-not $SinAbrir) { Start-Process explorer.exe $raiz }
