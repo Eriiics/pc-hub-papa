@@ -44,3 +44,4 @@ panel/claude.json
 panel/autopiloto.json
 panel/tarea*.json
 panel/prueba.md
+!android/pchub.keystore

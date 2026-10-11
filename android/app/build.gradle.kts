@@ -22,11 +22,21 @@ android {
         versionName = appVersion
     }
 
+    // Firma estable: la misma clave (android/pchub.keystore, va en el repositorio) en cualquier PC,
+    // para que la app nueva se instale encima de la anterior sin desinstalar.
+    signingConfigs {
+        create("pchub") {
+            storeFile = file("../pchub.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
-            // Para pruebas personales se firma con la clave de debug
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("pchub")
         }
     }
     compileOptions {

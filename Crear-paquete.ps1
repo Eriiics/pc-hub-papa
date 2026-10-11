@@ -23,7 +23,7 @@ dotnet publish (Join-Path $raiz 'agent\PcHub.Agent\PcHub.Agent.csproj') -c Relea
     -p:DebugType=None -p:DebugSymbols=false -o (Join-Path $salida 'PcHub-PC')
 if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación del programa del PC.' }
 
-Write-Host "2/3 Compilando la app del teléfono…" -ForegroundColor Cyan
+Write-Host "2/3 Compilando la app del teléfono (versión $version)…" -ForegroundColor Cyan
 Push-Location (Join-Path $raiz 'android')
 try {
     & .\gradlew.bat assembleRelease --console=plain
