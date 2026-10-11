@@ -18,7 +18,7 @@
 
 Mejoras priorizadas, de más a menos valiosa:
 
-1. **El asistente no sabe de Excel.** `AiModule` no tiene herramientas de Excel: para "suma la columna B" o "ponle negrita al encabezado" tiene que teclear a ciegas. Agregar herramientas `excel_read` (rango), `excel_write` (celda o rango) y `excel_action`, apoyadas en `ExcelModule`. *(primera mejora → tarea T021)*
+1. **El asistente no sabe de Excel.** `AiModule` no tiene herramientas de Excel: para "suma la columna B" o "ponle negrita al encabezado" tiene que teclear a ciegas. Agregar herramientas `excel_read` (rango), `excel_write` (celda o rango) y `excel_action`, apoyadas en `ExcelModule`. *(primera mejora → tarea T013)*
 2. **Los ejemplos del asistente son de la versión de Chacho.** `AiScreen.kt` ofrece "Anota una idea…", pero el buzón de ideas se quitó; además faltan ejemplos de Excel. Cambiarlos por órdenes que sí existen (Excel, abrir archivo, volumen).
 3. **Excel: seleccionar rangos desde el teléfono.** Hoy solo se toca una celda; falta arrastrar o elegir un rango (A1:B10) para copiar, formatear o sumar.
 4. **Excel: cuadrícula pequeña (12×5 fijo).** Permitir desplazarla o ampliarla, y escribir en una celda tocada sin ir a otra sección.
