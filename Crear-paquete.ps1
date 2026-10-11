@@ -1,4 +1,4 @@
-# Arma la carpeta "PcHub-Paquete" lista para llevar (pendrive, Drive, correo comprimido):
+﻿# Arma la carpeta "PcHub-Paquete" lista para llevar (pendrive, Drive, correo comprimido):
 #   - PcHub-PC\   el programa del PC (trae todo lo necesario, no hace falta instalar .NET)
 #   - PcHub.apk   la app del teléfono
 #   - LEEME.txt   los pasos para tu papá
