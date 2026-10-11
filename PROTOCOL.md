@@ -80,7 +80,7 @@ El PIN de 6 dígitos aparece en el menú del ícono de bandeja. Tras 5 intentos 
 | `excel.grid` | `rows?` (12), `cols?` (5) | `firstRow`, `firstCol`, `cols` (letras), `rows` (texto de cada celda), `activeRow`, `activeCol` |
 | `excel.select` | `cell` ("B7") o `dRow`, `dCol` (relativo a la celda activa) | estado |
 | `excel.write` | `value` (texto, número o fórmula con `=`), `next` = `down`/`right`/`none` | estado |
-| `excel.action` | `a` = `save` `undo` `clear` `bold` `autosum` `filter` `next_sheet` `prev_sheet` `new_sheet` | estado |
+| `excel.action` | `a` = `save` `undo` `clear` `bold` `autosum` `filter` `next_sheet` `prev_sheet` `new_sheet` `copy` `cut` `paste` `home` `jump_up` `jump_down` `jump_left` `jump_right` (como Ctrl+flecha) `insert_row` `delete_row` `autofit` `percent` `money` `number` | estado |
 | `excel.sheet` | `name` | estado |
 | `excel.files` | — | `files: [{path,name,folder,modified}]` (Recientes, Documentos, Escritorio y Descargas) |
 | `excel.open` | `path` (.xlsx/.xlsm/.xls/.csv) | `opening` |

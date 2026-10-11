@@ -197,10 +197,30 @@ public static class ExcelModule
             case "next_sheet": SiguienteHoja(app, +1); break;
             case "prev_sheet": SiguienteHoja(app, -1); break;
             case "new_sheet": app.Worksheets.Add(After: app.ActiveSheet); break;
+            case "copy": app.Selection.Copy(); break;
+            case "cut": app.Selection.Cut(); break;
+            case "paste": app.ActiveSheet.Paste(); app.CutCopyMode = false; break;
+            case "home": app.ActiveSheet.Range["A1"].Select(); break;
+            case "jump_up": Saltar(app, -4162); break;    // xlUp
+            case "jump_down": Saltar(app, -4121); break;  // xlDown
+            case "jump_left": Saltar(app, -4159); break;  // xlToLeft
+            case "jump_right": Saltar(app, -4161); break; // xlToRight
+            case "insert_row": app.Selection.EntireRow.Insert(); break;
+            case "delete_row": app.Selection.EntireRow.Delete(); break;
+            case "autofit": app.Selection.EntireColumn.AutoFit(); break;
+            case "percent": app.Selection.NumberFormat = "0%"; break;
+            case "money": app.Selection.NumberFormat = "$#,##0"; break;
+            case "number": app.Selection.NumberFormat = "General"; break;
             default: throw new ArgumentException("Acción de Excel desconocida: " + action);
         }
         return Status();
     });
+
+    /// <summary>Salta al borde del bloque de datos, como Ctrl + flecha.</summary>
+    private static void Saltar(dynamic app, int direccion)
+    {
+        app.ActiveCell.End(direccion).Select();
+    }
 
     /// <summary>Rango de números justo encima de la celda activa (para la suma automática).</summary>
     private static string SumaArriba(dynamic app)

@@ -42,6 +42,9 @@ desde el teléfono puedes:
    celda de abajo o a la de la derecha.
  - Sumar los números de arriba con un toque, poner negrita, borrar, filtrar.
  - Cambiar de hoja, crear una hoja nueva, deshacer y guardar.
+ - Copiar, cortar y pegar; agregar o quitar una fila; ajustar el ancho de la columna.
+ - Saltar al borde de los datos (como Ctrl + flecha) o volver al inicio de la hoja.
+ - Poner el número como porcentaje o como dinero.
 Si Excel está "ocupado" (editando una celda en el PC o con un cuadro abierto),
 termina eso en el PC y vuelve a intentar.
 

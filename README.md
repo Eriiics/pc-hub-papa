@@ -32,7 +32,7 @@ Pantalla **Excel** (en Módulos): controla el Excel que está abierto en el PC, 
 
 - Ver la hoja alrededor de la celda activa y tocar una celda para seleccionarla; flechas para moverte.
 - Escribir texto, números o fórmulas (`=SUMA(A1:A5)`) y pasar a la celda de abajo o de la derecha.
-- Sumar los números de arriba, negrita, borrar celda, filtro, cambiar/crear hojas, deshacer y guardar.
+- Sumar los números de arriba, negrita, borrar celda, filtro, cambiar/crear hojas, copiar/cortar/pegar, filas, saltar al borde de los datos, formato % y $, deshacer y guardar.
 - Archivos recientes (Recientes de Windows, Documentos, Escritorio, Descargas) para abrirlos desde el teléfono, y libro nuevo.
 - Si Excel está ocupado (editando una celda o con un cuadro abierto) avisa y hay que terminar eso en el PC.
 

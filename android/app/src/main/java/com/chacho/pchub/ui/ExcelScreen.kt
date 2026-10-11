@@ -209,6 +209,20 @@ fun ExcelScreen() {
                 }
             }
 
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    NeonButton("Inicio", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "home")) }
+                    NeonButton("Al borde ↑", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "jump_up")) }
+                    NeonButton("Al borde ↓", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "jump_down")) }
+                }
+            }
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    NeonButton("Al borde ←", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "jump_left")) }
+                    NeonButton("Al borde →", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "jump_right")) }
+                }
+            }
+
             // ---------- escribir ----------
             item {
                 val cell = status?.optString("cell") ?: ""
@@ -255,6 +269,27 @@ fun ExcelScreen() {
                     NeonButton("◀ Hoja", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "prev_sheet")) }
                     NeonButton("Hoja ▶", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "next_sheet")) }
                     NeonButton("+ Hoja", Modifier.weight(1f), outlined = true, accent = Neon.Lime) { call("excel.action", JSONObject().put("a", "new_sheet")) }
+                }
+            }
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    NeonButton("Copiar", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "copy")) }
+                    NeonButton("Cortar", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "cut")) }
+                    NeonButton("Pegar", Modifier.weight(1f), outlined = true, accent = Neon.Lime) { call("excel.action", JSONObject().put("a", "paste")) }
+                }
+            }
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    NeonButton("+ Fila", Modifier.weight(1f), outlined = true, accent = Neon.Lime) { call("excel.action", JSONObject().put("a", "insert_row")) }
+                    NeonButton("− Fila", Modifier.weight(1f), outlined = true, accent = Neon.Red) { call("excel.action", JSONObject().put("a", "delete_row")) }
+                    NeonButton("Ajustar ancho", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "autofit")) }
+                }
+            }
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    NeonButton("%", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "percent")) }
+                    NeonButton("$", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "money")) }
+                    NeonButton("Normal", Modifier.weight(1f), outlined = true) { call("excel.action", JSONObject().put("a", "number")) }
                 }
             }
             item {
