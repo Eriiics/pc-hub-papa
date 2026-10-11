@@ -66,6 +66,29 @@ Después, en la pestaña "IA" del teléfono le puedes decir cosas como
 "abre Excel y el archivo de ventas" o "sube el volumen".
 
 
+CAMBIAR PC HUB CON TU PROPIO CLAUDE
+-----------------------------------
+Dentro del paquete viene "PcHub-Codigo.zip": es el programa completo. Con tu
+Claude Code puedes pedirle que le agregue botones o cambie cosas, sin saber
+programar.
+1. Descomprime "PcHub-Codigo.zip" en una carpeta, por ejemplo en Documentos.
+2. Abre Claude Code en esa carpeta (en el Explorador: clic en la barra de la
+   dirección, escribe "powershell" y Enter; luego escribe "claude").
+3. Pídele lo que quieras con tus palabras. Por ejemplo:
+   - "Agrega en la pantalla de Excel un botón para ordenar la columna de menor a mayor."
+   - "Quiero que en Inicio salga primero el botón del Asistente."
+   - "Cambia el color de los botones a azul."
+   - "Ahora arma el paquete nuevo." (te dirá cuando esté listo y qué instalar)
+4. La primera vez te dirá si falta instalar algo (.NET, Java o Android).
+   Dile "instala lo que falte" y espera: puede tardar un rato.
+5. Cuando termine, instala el resultado igual que una actualización:
+   - PC: abre PcHub.Agent.exe (dentro de PcHub-PC, en la carpeta PcHub-Paquete
+     nueva) y elige "Sí".
+   - Teléfono: pasa PcHub.apk y ábrelo (se instala encima).
+Tu PIN y tus teléfonos vinculados se conservan. Si algo sale mal, dile a Claude
+"vuelve a como estaba antes" y vuelve a armar el paquete.
+
+
 SI ALGO NO FUNCIONA
 -------------------
  - "No encuentra el PC": revisa que el teléfono y el PC estén en el mismo Wi-Fi.
