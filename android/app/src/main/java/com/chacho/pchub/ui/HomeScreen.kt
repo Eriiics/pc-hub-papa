@@ -40,6 +40,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,6 +75,7 @@ fun HomeScreen(nav: Nav) {
             .padding(horizontal = 16.dp)
     ) {
         Spacer(Modifier.height(6.dp))
+        VersionNotice()
         AiBar(nav)
 
         Spacer(Modifier.height(14.dp))
@@ -87,6 +90,42 @@ fun HomeScreen(nav: Nav) {
             }
         }
         Spacer(Modifier.height(24.dp))
+    }
+}
+
+/** Aviso amable si el programa del PC y la app del teléfono tienen versiones distintas. */
+@Composable
+private fun VersionNotice() {
+    val context = LocalContext.current
+    var message by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) {
+        try {
+            val agent = Pc.call("app.info").optString("number")
+            val app = context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
+            fun parts(v: String) = v.split('.').map { it.toIntOrNull() ?: 0 }
+            fun cmp(a: String, b: String): Int {
+                val x = parts(a); val y = parts(b)
+                for (i in 0 until maxOf(x.size, y.size)) {
+                    val d = x.getOrElse(i) { 0 }.compareTo(y.getOrElse(i) { 0 })
+                    if (d != 0) return d
+                }
+                return 0
+            }
+            message = when {
+                agent.isEmpty() -> "El programa del PC es más antiguo que esta app. Ábrelo desde la carpeta nueva (PcHub.Agent.exe) para actualizarlo."
+                cmp(agent, app) < 0 -> "El programa del PC (versión $agent) es más antiguo que esta app ($app). Ábrelo desde la carpeta nueva (PcHub.Agent.exe) para actualizarlo."
+                cmp(agent, app) > 0 -> "La app del teléfono (versión $app) es más antigua que el programa del PC ($agent). Instala el PcHub.apk nuevo para actualizarla."
+                else -> null
+            }
+        } catch (_: Exception) {
+            // Sin conexión: no se avisa nada
+        }
+    }
+    message?.let {
+        GlassCard(Modifier.fillMaxWidth().padding(bottom = 10.dp), glow = Neon.Amber) {
+            Text("Hay una actualización pendiente", style = MaterialTheme.typography.titleSmall, color = Neon.Amber)
+            Text(it, style = MaterialTheme.typography.bodySmall, color = Neon.Text)
+        }
     }
 }
 

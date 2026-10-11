@@ -75,7 +75,7 @@ El PIN de 6 dígitos aparece en el menú del ícono de bandeja. Tras 5 intentos 
 | `ai.ask` | `text` | `reply`, `actions` |
 | `ai.reset` | — | — |
 | `ai.confirm` | `id`, `ok` (bool) | — |
-| `app.info` | — | `version`, `installed`, `runningInstalled`, `startup`, `ai` |
+| `app.info` | — | `version` (texto para mostrar), `number` (x.y.z, la app lo compara con la suya y avisa si no coinciden), `installed`, `runningInstalled`, `startup`, `ai` |
 | `excel.status` | — | `installed`, `running`, `workbook?`, `saved`, `sheet`, `sheets`, `cell`, `value`, `formula`, `selection` |
 | `excel.grid` | `rows?` (12), `cols?` (5) | `firstRow`, `firstCol`, `cols` (letras), `rows` (texto de cada celda), `activeRow`, `activeCol` |
 | `excel.select` | `cell` ("B7") o `dRow`, `dCol` (relativo a la celda activa) | estado |

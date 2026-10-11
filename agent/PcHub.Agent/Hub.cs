@@ -73,6 +73,7 @@ public sealed class Hub : IAsyncDisposable
     private JsonObject AppInfo() => new()
     {
         ["version"] = Installer.VersionLabel,
+        ["number"] = Installer.Number,
         ["installed"] = Installer.IsInstalled,
         ["runningInstalled"] = Installer.RunningFromInstall,
         ["startup"] = Installer.StartupEnabled,
