@@ -46,7 +46,7 @@ $sdk = @($env:ANDROID_HOME, $env:ANDROID_SDK_ROOT, "$env:LOCALAPPDATA\Android\Sd
 if ($sdk) {
     Ok "SDK de Android ($sdk)"
     $lp = Join-Path $raiz 'android\local.properties'
-    if (-not (Test-Path $lp)) { "sdk.dir=" + ($sdk -replace '\', '\') | Set-Content $lp -Encoding ASCII }
+    if (-not (Test-Path $lp)) { "sdk.dir=" + $sdk.Replace([char]92, "/") | Set-Content $lp -Encoding ASCII }
 }
 else { Falta "El SDK de Android con la plataforma 35" "Instala Android Studio (https://developer.android.com/studio), ábrelo una vez y en More Actions > SDK Manager marca 'Android 15 (API 35)'." }
 
