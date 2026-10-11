@@ -61,18 +61,11 @@ import com.chacho.pchub.Prefs
 import com.chacho.pchub.net.Pc
 import org.json.JSONObject
 
+/** Lo que más se usa, a la vista y en botones grandes. */
+private val MainScreens = listOf(Screen.Excel, Screen.Touchpad, Screen.Media, Screen.Windows, Screen.Apps, Screen.System)
+
 @Composable
 fun HomeScreen(nav: Nav) {
-    val scope = rememberCoroutineScope()
-    var editing by remember { mutableStateOf(false) }
-    var adding by remember { mutableStateOf(false) }
-    var shortcuts by remember(Prefs.shortcutsJson) { mutableStateOf(Shortcuts.load()) }
-
-    fun update(list: List<Shortcut>) {
-        shortcuts = list
-        Shortcuts.save(list)
-    }
-
     Column(
         Modifier
             .fillMaxSize()
@@ -85,93 +78,15 @@ fun HomeScreen(nav: Nav) {
         Spacer(Modifier.height(14.dp))
         NowPlayingCard(onOpen = { nav.go(Screen.Media) })
 
-        // ---------- módulos favoritos y más usados ----------
-        SectionTitle("Tus módulos", trailing = {
-            Text("Mantén para fijar ★", style = MaterialTheme.typography.labelSmall, color = Neon.TextFaint)
-        })
-        Row(
-            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            topModules().forEach { s ->
-                val fav = s.name in Prefs.favorites
-                NeonTile(
-                    s.title,
-                    Modifier.width(92.dp),
-                    icon = s.icon,
-                    accent = s.accent,
-                    highlighted = fav,
-                    badge = if (fav) "★" else null,
-                    onLongClick = { Prefs.toggleFavorite(s.name) },
-                ) { nav.go(s) }
-            }
-        }
-
-        // ---------- accesos editables ----------
-        SectionTitle("Accesos", trailing = {
-            TextButton(onClick = { editing = !editing }) {
-                Text(if (editing) "Listo" else "Editar", color = Neon.Cyan)
-            }
-        })
-        val tiles = shortcuts.size + 1
-        val columns = 4
-        (0 until (tiles + columns - 1) / columns).forEach { row ->
+        SectionTitle("¿Qué quieres hacer?")
+        MainScreens.chunked(2).forEach { pair ->
             Row(Modifier.fillMaxWidth().padding(bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                for (col in 0 until columns) {
-                    val i = row * columns + col
-                    Box(Modifier.weight(1f)) {
-                        when {
-                            i < shortcuts.size -> {
-                                val s = shortcuts[i]
-                                ShortcutTile(s, onLongClick = { editing = true }) {
-                                    if (!editing) Shortcuts.run(s, scope, nav)
-                                }
-                                if (editing) EditOverlay(
-                                    canLeft = i > 0,
-                                    canRight = i < shortcuts.size - 1,
-                                    onLeft = { update(shortcuts.toMutableList().apply { add(i - 1, removeAt(i)) }) },
-                                    onRight = { update(shortcuts.toMutableList().apply { add(i + 1, removeAt(i)) }) },
-                                    onRemove = { update(shortcuts.toMutableList().apply { removeAt(i) }) },
-                                )
-                            }
-                            i == shortcuts.size -> NeonTile("Agregar", icon = Icons.Filled.Add, accent = Neon.TextDim) { adding = true }
-                        }
-                    }
+                pair.forEach { s ->
+                    NeonTile(s.title, Modifier.weight(1f), icon = s.icon, accent = s.accent, highlighted = true) { nav.go(s) }
                 }
             }
         }
-
-        // ---------- atajos ----------
-        SectionTitle("Teclas rápidas")
-        QuickKeyRow()
         Spacer(Modifier.height(24.dp))
-    }
-
-    if (adding) AddShortcutSheet(onDismiss = { adding = false }) { s ->
-        update(shortcuts + s)
-        adding = false
-    }
-}
-
-/** Favoritos primero, luego los más usados; si no hay historial, una selección por defecto. */
-@Composable
-private fun topModules(): List<Screen> {
-    val favs = ModuleScreens.filter { it.name in Prefs.favorites }
-    val used = ModuleScreens
-        .filter { it.name !in Prefs.favorites && (Prefs.usage[it.name] ?: 0) > 0 }
-        .sortedByDescending { Prefs.usage[it.name] ?: 0 }
-    val defaults = listOf(Screen.Touchpad, Screen.Pointer, Screen.Media, Screen.YouTube, Screen.Windows, Screen.Ai)
-    return (favs + used + defaults).distinct().take(8)
-}
-
-@Composable
-private fun EditOverlay(canLeft: Boolean, canRight: Boolean, onLeft: () -> Unit, onRight: () -> Unit, onRemove: () -> Unit) {
-    Box(Modifier.fillMaxWidth()) {
-        NeonIconButton(Icons.Filled.Close, "Quitar", Modifier.align(Alignment.TopEnd), size = 26.dp, accent = Neon.Red, onClick = onRemove)
-        Row(Modifier.align(Alignment.TopStart)) {
-            if (canLeft) NeonIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Mover", size = 26.dp, accent = Neon.TextDim, onClick = onLeft)
-            if (canRight) NeonIconButton(Icons.AutoMirrored.Filled.ArrowForward, "Mover", size = 26.dp, accent = Neon.TextDim, onClick = onRight)
-        }
     }
 }
 

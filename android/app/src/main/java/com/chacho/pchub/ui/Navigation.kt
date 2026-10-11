@@ -41,7 +41,7 @@ enum class Screen(
 ) {
     Home("Inicio", Tab.Home, Icons.Filled.Home, NeonRaw.Cyan, "", module = false),
     Touchpad("Touchpad", Tab.Control, Icons.Filled.TouchApp, NeonRaw.Cyan, "Mouse con el dedo"),
-    Pointer("Puntero", Tab.Control, Icons.Filled.SportsEsports, NeonRaw.Magenta, "Apunta moviendo el teléfono"),
+    Pointer("Puntero", Tab.Control, Icons.Filled.SportsEsports, NeonRaw.Magenta, "Apunta moviendo el teléfono", module = false),
     Media("Reproductor", Tab.Music, Icons.Filled.MusicNote, NeonRaw.Violet, "Lo que suena en el PC"),
     YouTube("YouTube", Tab.Music, Icons.Filled.SmartDisplay, NeonRaw.Red, "Buscar y reproducir"),
     Ai("Asistente", Tab.Ai, Icons.Filled.AutoAwesome, NeonRaw.Violet, "Pídele cosas al PC"),
@@ -49,9 +49,9 @@ enum class Screen(
     Windows("Ventanas", Tab.Modules, Icons.Filled.Tab, NeonRaw.Cyan, "Cambiar y cerrar ventanas"),
     Apps("Aplicaciones", Tab.Modules, Icons.Filled.Apps, NeonRaw.Lime, "Abrir apps y juegos"),
     System("Sistema", Tab.Modules, Icons.Filled.PowerSettingsNew, NeonRaw.Amber, "Energía y portapapeles"),
-    Terminal("Terminal", Tab.Modules, Icons.Filled.Terminal, NeonRaw.Lime, "PowerShell completa, también en el PC"),
+    Terminal("Terminal", Tab.Modules, Icons.Filled.Terminal, NeonRaw.Lime, "PowerShell completa, también en el PC", module = false),
     Excel("Excel", Tab.Modules, Icons.Filled.TableChart, NeonRaw.Lime, "Ver la hoja, escribir y guardar"),
-    Settings("Ajustes", Tab.Modules, Icons.Filled.Settings, NeonRaw.TextDim, "PC, mouse y actualizaciones"),
+    Settings("Ajustes", Tab.Modules, Icons.Filled.Settings, NeonRaw.TextDim, "Tu PC y el mouse"),
     ;
 
     /** Color de acento con la intensidad de neón elegida en Ajustes. */
