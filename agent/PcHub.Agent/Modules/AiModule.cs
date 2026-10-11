@@ -186,6 +186,7 @@ public sealed partial class AiModule
             - Usa run_powershell solo cuando no haya otra forma; el usuario debe aprobarlo en el teléfono.
             - Nunca hagas acciones destructivas (borrar archivos, cerrar sin guardar, desinstalar) sin que el usuario lo pida explícitamente.
             - Si necesitas saber qué hay abierto, usa get_pc_state.
+            - Para Excel usa excel_read, excel_write y excel_action (no teclees en la hoja). Lee antes de calcular, y para sumar escribe una fórmula (=SUMA) en una celda vacía junto a los datos.
             - Después de abrir o enfocar una app, si vas a escribir en ella, espera un momento con wait (300-1500 ms).
             - Si algo falla, explica en una frase qué pasó.
             - Responde en texto plano, sin Markdown (nada de **negritas** ni listas): se muestra tal cual en el teléfono.
@@ -223,7 +224,10 @@ public sealed partial class AiModule
       {"name":"system_action","description":"Acciones del sistema. shutdown, restart y sleep piden confirmación al usuario.","input_schema":{"type":"object","properties":{"action":{"type":"string","enum":["lock","sleep","monitor_off","shutdown","restart","cancel_shutdown"]}},"required":["action"]}},
       {"name":"run_powershell","description":"Ejecuta un script de PowerShell y devuelve su salida. Requiere aprobación del usuario en el teléfono. Explica el motivo en 'reason'.","input_schema":{"type":"object","properties":{"script":{"type":"string"},"reason":{"type":"string"}},"required":["script","reason"]}},
       {"name":"wait","description":"Espera unos milisegundos (máx. 5000) entre pasos.","input_schema":{"type":"object","properties":{"ms":{"type":"integer","minimum":0,"maximum":5000}},"required":["ms"]}},
-      {"name":"play_youtube","description":"Busca en YouTube (o YouTube Music si music=true) y reproduce el primer resultado en la pestaña de YouTube abierta (o una nueva). Úsalo para 'pon X en YouTube' o 'pon la canción X'.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"music":{"type":"boolean"}},"required":["query"]}}
+      {"name":"play_youtube","description":"Busca en YouTube (o YouTube Music si music=true) y reproduce el primer resultado en la pestaña de YouTube abierta (o una nueva). Úsalo para 'pon X en YouTube' o 'pon la canción X'.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"music":{"type":"boolean"}},"required":["query"]}},
+      {"name":"excel_read","description":"Lee celdas del Excel abierto (hoja activa). range como 'A1:C10'; vacío = toda la zona usada (máx. 500 celdas). Las fórmulas vienen entre paréntesis. Úsalo antes de sumar, buscar o editar.","input_schema":{"type":"object","properties":{"range":{"type":"string"}}}},
+      {"name":"excel_write","description":"Escribe en el Excel abierto desde la celda 'cell'. 'values' es un texto/número o una lista de filas (cada fila, una lista de valores). Los que empiezan con '=' son fórmulas, p. ej. '=SUMA(B2:B20)'.","input_schema":{"type":"object","properties":{"cell":{"type":"string"},"values":{}},"required":["cell","values"]}},
+      {"name":"excel_action","description":"Acción en Excel sobre 'range' (opcional, se selecciona primero): save, undo, clear, bold, autosum, filter, copy, cut, paste, insert_row, delete_row, autofit, percent, money, number, next_sheet, prev_sheet, new_sheet.","input_schema":{"type":"object","properties":{"action":{"type":"string"},"range":{"type":"string"}},"required":["action"]}}
     ]
     """)!;
 
@@ -364,6 +368,21 @@ public sealed partial class AiModule
                 return $"{msg} \"{first["title"]}\" de {first["channel"]}";
             }
 
+            case "excel_read":
+                return ExcelModule.ReadRange(Hub.S(input, "range")).ToJsonString();
+
+            case "excel_write":
+                ExcelModule.WriteRange(Hub.S(input, "cell"), input["values"] ?? "");
+                return "ok";
+
+            case "excel_action":
+            {
+                var range = Hub.S(input, "range");
+                if (range.Length > 0) ExcelModule.Select(range, 0, 0);
+                ExcelModule.Action(Hub.S(input, "action"));
+                return "ok";
+            }
+
             default:
                 throw new ArgumentException($"Herramienta desconocida: {name}");
         }
@@ -384,6 +403,9 @@ public sealed partial class AiModule
         "system_action" => $"Sistema: {Hub.S(input, "action")}",
         "run_powershell" => "PowerShell (esperando tu aprobación)",
         "wait" => "Esperando…",
+        "excel_read" => $"Leyendo Excel {Hub.S(input, "range")}".TrimEnd(),
+        "excel_write" => $"Escribiendo en Excel ({Hub.S(input, "cell")})",
+        "excel_action" => $"Excel: {Hub.S(input, "action")}",
         "play_youtube" => $"Buscando \"{Hub.S(input, "query")}\" en {(Hub.B(input, "music") ? "YouTube Music" : "YouTube")}",
         _ => name,
     };

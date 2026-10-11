@@ -94,7 +94,8 @@ private val Examples = listOf(
     "Sube el volumen al 40%",
     "Abre Discord",
     "¿Qué tengo abierto?",
-    "Anota una idea: modo cine que baje las luces",
+    "Suma la columna B del Excel",
+    "Ponle negrita a la fila 1 del Excel",
 )
 
 @Composable

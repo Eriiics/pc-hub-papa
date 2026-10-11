@@ -138,6 +138,62 @@ public static class ExcelModule
         });
     }
 
+    /// <summary>Lee un rango ("A1:C10", o toda la zona usada si va vacío) como texto, con un máximo de 500 celdas.</summary>
+    public static JsonNode ReadRange(string? range) => Seguro<JsonNode>(() =>
+    {
+        var app = Requerir();
+        var sheet = app.ActiveSheet;
+        dynamic r = string.IsNullOrWhiteSpace(range) ? sheet.UsedRange : sheet.Range[range.Trim().ToUpperInvariant()];
+        int rows = (int)r.Rows.Count, cols = (int)r.Columns.Count;
+        int firstRow = (int)r.Row, firstCol = (int)r.Column;
+        if (rows * cols > 500) throw new ArgumentException($"El rango tiene {rows * cols} celdas; pide como máximo 500 a la vez.");
+        var data = new JsonArray();
+        for (int i = 1; i <= rows; i++)
+        {
+            var line = new JsonArray();
+            for (int j = 1; j <= cols; j++)
+            {
+                var cell = r.Cells[i, j];
+                var formula = Convert.ToString(cell.Formula) ?? "";
+                line.Add(formula.StartsWith('=') ? $"{Texto(cell)} ({formula})" : Texto(cell));
+            }
+            data.Add(line);
+        }
+        return new JsonObject
+        {
+            ["sheet"] = (string)sheet.Name,
+            ["range"] = (string)r.Address(false, false),
+            ["firstRow"] = firstRow,
+            ["firstCol"] = NombreColumna(firstCol),
+            ["rows"] = data,
+        };
+    });
+
+    /// <summary>Escribe un valor en una celda o una tabla de valores (filas) desde una celda inicial.</summary>
+    public static JsonNode WriteRange(string cell, JsonNode values) => Seguro<JsonNode>(() =>
+    {
+        var app = Requerir();
+        var sheet = app.ActiveSheet;
+        var start = sheet.Range[cell.Trim().ToUpperInvariant()];
+        int r0 = (int)start.Row, c0 = (int)start.Column;
+        var table = new List<List<string>>();
+        if (values is JsonArray arr)
+        {
+            foreach (var row in arr)
+                table.Add(row is JsonArray cells ? cells.Select(c => c?.ToString() ?? "").ToList() : new List<string> { row?.ToString() ?? "" });
+        }
+        else table.Add(new List<string> { values.ToString() });
+        if (table.Sum(t => t.Count) > 500) throw new ArgumentException("Son demasiadas celdas; escribe como máximo 500 a la vez.");
+        for (int i = 0; i < table.Count; i++)
+            for (int j = 0; j < table[i].Count; j++)
+            {
+                var v = table[i][j];
+                var target = sheet.Cells[r0 + i, c0 + j];
+                if (v.StartsWith('=')) target.Formula = v; else target.Value2 = v;
+            }
+        return Status();
+    });
+
     private static string NombreColumna(int n)
     {
         var s = "";
