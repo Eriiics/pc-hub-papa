@@ -18,13 +18,14 @@ Abre `LEEME.txt` (viene dentro del paquete): son tres pasos, instalar en el PC, 
 
 ## Para armar el paquete
 
-1. Necesitas en este PC: .NET 8 SDK, el SDK de Android y un JDK 17 o 21.
-2. Clic derecho en `Crear-paquete.ps1` → *Ejecutar con PowerShell*.
-3. Se crea `PcHub-Paquete/` con `PcHub-PC/` (el programa, con todo incluido: no hay que instalar .NET), `PcHub.apk` y `LEEME.txt`.
-   Comprímela en un .zip y pásala por pendrive, Drive o correo.
+1. Necesitas en este PC: .NET 8 SDK, el SDK de Android y un JDK 17 o 21. `Revisar-requisitos.ps1` lo comprueba y explica qué falta (`Crear-paquete.ps1` lo ejecuta solo).
+2. Sube `VERSION` si es una entrega nueva (la APK solo se instala encima si el número es mayor).
+3. Clic derecho en `Crear-paquete.ps1` → *Ejecutar con PowerShell*.
+4. Se crea `PcHub-Paquete/` con `PcHub-PC/` (el programa, con todo incluido: no hay que instalar .NET), `PcHub.apk`, `LEEME.txt`, `ACTUALIZAR.txt` y `PcHub-Codigo.zip` (el código fuente, para cambiar PC Hub con Claude Code), más `PcHub-Paquete-<versión>.zip` listo para pasar por pendrive, Drive o correo.
 
-Para actualizar: vuelve a armar el paquete y pásalo. Al abrir `PcHub.Agent.exe` ofrece instalar y reemplaza la versión anterior
-(la configuración y los dispositivos vinculados se conservan).
+Para actualizar: vuelve a armar el paquete y pásalo. Al abrir `PcHub.Agent.exe` avisa que hay una versión nueva, cierra la anterior y la reemplaza
+(la configuración y los dispositivos vinculados se conservan). La APK se instala encima porque siempre se firma con `android/pchub.keystore`.
+Si el teléfono y el PC quedan con versiones distintas, la app lo avisa en Inicio.
 
 ## Excel
 
@@ -44,5 +45,5 @@ claude.ai sin API key ni costo extra. También acepta una API key si se prefiere
 ## Resto de módulos
 
 Touchpad, puntero (giroscopio), reproductor y YouTube / YouTube Music, ventanas, aplicaciones, sistema (energía y portapapeles),
-terminal PowerShell, comandos personalizados y reglas de contexto (la app cambia de pantalla según la ventana activa del PC).
+comandos personalizados y reglas de contexto (la app cambia de pantalla según la ventana activa del PC).
 Los comandos y reglas se editan en `%APPDATA%\PcHub\config.json` (clic derecho en el ícono → *Abrir configuración*).

@@ -204,7 +204,6 @@ object Pc {
         Prefs.pcName = name
         error.value = null
         status.value = Status.Connected
-        // ¿Hay actualización pendiente? (el aviso también llega solo cuando aparece una nueva)
         scope.launch {
             FastInput.setup(Prefs.host)
         }
