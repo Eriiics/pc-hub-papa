@@ -10,12 +10,8 @@ $raiz = $PSScriptRoot
 $salida = Join-Path $raiz 'PcHub-Paquete'
 $version = (Get-Content (Join-Path $raiz 'VERSION') -Raw).Trim()
 
-# JDK 17 o 21 para Gradle (el JDK 25 todavía no sirve con estas versiones de Gradle/Kotlin)
-if (-not $env:JAVA_HOME -or ((& "$env:JAVA_HOME\bin\java.exe" -version 2>&1 | Out-String) -match 'version "2[2-9]')) {
-    $jdk = Get-ChildItem "$HOME\.jdks" -Directory -ErrorAction SilentlyContinue | Where-Object Name -match '21|17' | Select-Object -First 1
-    if ($jdk) { $env:JAVA_HOME = $jdk.FullName }
-}
-if (-not $env:JAVA_HOME) { throw 'No encontré un JDK 17 o 21. Define JAVA_HOME.' }
+# Comprueba .NET, JDK 17/21 y el SDK de Android (y explica en español qué falta)
+. (Join-Path $raiz 'Revisar-requisitos.ps1')
 
 if (Test-Path $salida) { Remove-Item $salida -Recurse -Force }
 New-Item -ItemType Directory $salida | Out-Null
@@ -33,7 +29,15 @@ try {
 } finally { Pop-Location }
 Copy-Item (Join-Path $raiz 'android\app\build\outputs\apk\release\app-release.apk') (Join-Path $salida 'PcHub.apk')
 
-Write-Host "3/3 Escribiendo las instrucciones…" -ForegroundColor Cyan
+Write-Host "3/3 Guardando el código fuente y las instrucciones…" -ForegroundColor Cyan
+# El código va dentro del paquete para poder cambiar y volver a armar la app con Claude Code.
+# git archive incluye solo lo guardado en git (sin carpetas compiladas).
+if (Test-Path (Join-Path $raiz '.git')) {
+    if (git -C $raiz status --porcelain -- agent android PROTOCOL.md VERSION CLAUDE.md Crear-paquete.ps1) {
+        Write-Host "  Aviso: hay cambios sin guardar en git; el código fuente del paquete no los incluye." -ForegroundColor Yellow
+    }
+    git -C $raiz archive --format=zip -o (Join-Path $salida 'PcHub-Codigo.zip') HEAD
+}
 Copy-Item (Join-Path $raiz 'LEEME-PAPA.txt') (Join-Path $salida 'LEEME.txt')
 @"
 PC Hub ${version}: cómo actualizar (2 minutos)
