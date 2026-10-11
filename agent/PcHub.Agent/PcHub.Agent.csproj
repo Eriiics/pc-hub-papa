@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- El sufijo 10.0.19041.0 habilita las APIs de Windows (Media Session) -->
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <UseWindowsForms>true</UseWindowsForms>
+    <!-- WPF solo se usa para UI Automation (detectar campos de texto) -->
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>PcHub.Agent</RootNamespace>
+    <AssemblyName>PcHub.Agent</AssemblyName>
+    <!-- Versión única para la app y el agente: archivo VERSION en la raíz del repositorio -->
+    <VersionFile>$(MSBuildThisFileDirectory)..\..\VERSION</VersionFile>
+    <Version Condition="Exists('$(VersionFile)')">$([System.IO.File]::ReadAllText('$(VersionFile)').Trim())</Version>
+    <Version Condition="'$(Version)' == ''">0.0.0</Version>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Kestrel (servidor WebSocket) dentro de una app de escritorio -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Volumen general y por aplicación (Core Audio) -->
+    <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
+    <!-- Guardar la API key cifrada con tu usuario de Windows (DPAPI) -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Página de la terminal para la ventana del PC (xterm.js) -->
+    <None Update="web\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

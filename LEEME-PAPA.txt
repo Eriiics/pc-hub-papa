@@ -1,0 +1,63 @@
+PC HUB: controla tu computador desde el teléfono
+=================================================
+
+Con PC Hub usas el teléfono como mouse y teclado, controlas la música y los
+videos, cambias de ventana y manejas tus planillas de Excel. También hay un
+asistente (Claude) al que le pides cosas con la voz o escribiendo.
+
+Lo que necesitas: el PC con Windows y un teléfono Android, los dos conectados
+al MISMO Wi-Fi.
+
+
+PASO 1: instalar en el PC (una sola vez)
+----------------------------------------
+1. Abre la carpeta "PcHub-PC" y haz doble clic en "PcHub.Agent.exe".
+2. Si Windows pregunta por seguridad: "Más información" -> "Ejecutar de todas formas".
+3. Cuando pregunte "¿Quieres instalarlo en este PC?" elige "Sí".
+   Queda en el menú Inicio y se abre solo cada vez que enciendes el PC.
+4. Si Windows pregunta por el firewall, elige "Permitir acceso" (redes privadas).
+5. Aparece un ícono en la barra de abajo, junto al reloj (si no lo ves, toca la
+   flechita ^). Haz doble clic ahí: sale un PIN de 6 números.
+
+PASO 2: instalar en el teléfono (una sola vez)
+----------------------------------------------
+1. Pasa el archivo "PcHub.apk" al teléfono (cable, Drive, WhatsApp o correo).
+2. Ábrelo desde el teléfono. Android pedirá permiso para "instalar apps
+   desconocidas": acéptalo solo para esa app (Archivos, Drive, etc.).
+3. Abre "PC Hub".
+
+PASO 3: conectar
+----------------
+1. La app busca tu PC sola. Tócalo en la lista.
+   (Si no aparece, escribe la IP que sale al hacer doble clic en el ícono del PC.)
+2. Escribe el PIN de 6 números. Listo: no tendrás que hacerlo de nuevo.
+
+
+EXCEL
+-----
+Abre Excel en el PC (o elige un archivo en la pantalla "Excel" de la app) y
+desde el teléfono puedes:
+ - Ver la hoja y tocar una celda para seleccionarla.
+ - Escribir un dato o una fórmula (por ejemplo =SUMA(A1:A5)) y pasar a la
+   celda de abajo o a la de la derecha.
+ - Sumar los números de arriba con un toque, poner negrita, borrar, filtrar.
+ - Cambiar de hoja, crear una hoja nueva, deshacer y guardar.
+Si Excel está "ocupado" (editando una celda en el PC o con un cuadro abierto),
+termina eso en el PC y vuelve a intentar.
+
+
+EL ASISTENTE (CLAUDE)
+---------------------
+Como ya usas Claude Code, el asistente lo aprovecha sin pagar nada extra:
+1. Clic derecho en el ícono de PC Hub (junto al reloj) -> "Configurar asistente IA…".
+2. Elige "Claude Code" y listo.
+Después, en la pestaña "IA" del teléfono le puedes decir cosas como
+"abre Excel y el archivo de ventas" o "sube el volumen".
+
+
+SI ALGO NO FUNCIONA
+-------------------
+ - "No encuentra el PC": revisa que el teléfono y el PC estén en el mismo Wi-Fi.
+ - "PIN incorrecto": clic derecho en el ícono -> "Generar nuevo PIN".
+ - Cambiaste de PC o de teléfono: instala de nuevo en el equipo nuevo.
+ - Para desinstalar: Configuración de Windows -> Aplicaciones -> PC Hub.

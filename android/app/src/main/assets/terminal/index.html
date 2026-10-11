@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>PC Hub · Terminal</title>
+<link rel="stylesheet" href="xterm.css">
+<style>
+  html, body { margin: 0; height: 100%; background: #07060D; overflow: hidden; }
+  #term { position: absolute; inset: 6px; }
+  #closed { display: none; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            color: #A9A3C2; font: 14px system-ui, sans-serif; text-align: center; }
+  .xterm .xterm-viewport { background: transparent !important; }
+</style>
+</head>
+<body>
+<div id="term"></div>
+<div id="closed">La terminal se ocultó desde el teléfono.<br>Puedes cerrar esta ventana.</div>
+<script src="xterm.js"></script>
+<script src="addon-fit.js"></script>
+<script>
+// Página única para el teléfono (WebView con el puente PcHubBridge) y para la ventana del PC (WebSocket al agente).
+(function () {
+  var bridge = window.PcHubBridge || null;
+  var term = new Terminal({
+    cursorBlink: true,
+    fontFamily: 'Consolas, "Cascadia Mono", "Roboto Mono", "Droid Sans Mono", monospace',
+    fontSize: bridge ? 12 : 15,
+    scrollback: 5000,
+    allowProposedApi: true,
+    theme: {
+      background: '#07060D', foreground: '#F1EEFF', cursor: '#00E5FF', cursorAccent: '#07060D',
+      selectionBackground: 'rgba(155, 92, 255, 0.35)',
+      black: '#1b1828', red: '#ff5c7a', green: '#b6ff3b', yellow: '#ffb547', blue: '#6aa8ff',
+      magenta: '#ff5ce0', cyan: '#00e5ff', white: '#d9d5ea',
+      brightBlack: '#6e6889', brightRed: '#ff8aa0', brightGreen: '#d2ff7a', brightYellow: '#ffd08a',
+      brightBlue: '#9cc4ff', brightMagenta: '#ff9aea', brightCyan: '#7ff1ff', brightWhite: '#ffffff'
+    }
+  });
+  var fit = new FitAddon.FitAddon();
+  term.loadAddon(fit);
+  term.open(document.getElementById('term'));
+
+  function b64ToBytes(b64) {
+    var s = atob(b64), out = new Uint8Array(s.length);
+    for (var i = 0; i < s.length; i++) out[i] = s.charCodeAt(i);
+    return out;
+  }
+
+  var send = function () {};
+  var sendSize = function () {};
+
+  function doFit() {
+    try { fit.fit(); } catch (e) {}
+    sendSize(term.cols, term.rows);
+  }
+
+  if (bridge) {
+    // ---------- teléfono ----------
+    send = function (d) { bridge.input(d); };
+    sendSize = function (c, r) { bridge.resize(c, r); };
+    window.pchubReset = function () { term.reset(); };
+    window.pchubWrite = function (b64) { term.write(b64ToBytes(b64)); };
+    window.pchubFocus = function () { term.focus(); };
+    window.pchubFit = doFit;
+    window.pchubFont = function (size) { term.options.fontSize = size; doFit(); };
+    window.pchubScroll = function (lines) { term.scrollLines(lines); };
+    term.onData(function (d) { send(d); });
+    window.addEventListener('resize', doFit);
+    setTimeout(function () { doFit(); bridge.ready(); }, 50);
+  } else {
+    // ---------- ventana del PC ----------
+    var q = new URLSearchParams(location.search);
+    var ws = new WebSocket('ws://' + location.host + '/term/ws?id=' + encodeURIComponent(q.get('id') || '') + '&k=' + encodeURIComponent(q.get('k') || ''));
+    ws.binaryType = 'arraybuffer';
+    send = function (d) { if (ws.readyState === 1) ws.send(JSON.stringify({ t: 'in', d: d })); };
+    sendSize = function (c, r) { if (ws.readyState === 1) ws.send(JSON.stringify({ t: 'resize', c: c, r: r })); };
+    ws.onopen = function () { doFit(); term.focus(); };
+    ws.onmessage = function (ev) {
+      if (typeof ev.data === 'string') {
+        var m = JSON.parse(ev.data);
+        if (m.t === 'hello') document.title = m.title;
+        return;
+      }
+      term.write(new Uint8Array(ev.data));
+    };
+    ws.onclose = function () {
+      document.getElementById('term').style.opacity = '0.25';
+      document.getElementById('closed').style.display = 'block';
+      setTimeout(function () { window.close(); }, 600);
+    };
+    term.onData(function (d) { send(d); });
+    window.addEventListener('resize', doFit);
+    doFit();
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ws:// sin cifrar solo tiene sentido en la red local; el agente no se expone a internet -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

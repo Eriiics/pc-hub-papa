@@ -1,0 +1,46 @@
+# Compilados por PC Hub (APK y agente)
+dist/
+# Paquete listo para llevar (lo genera Crear-paquete.ps1)
+PcHub-Paquete/
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
+
+# Android / Gradle
+.gradle/
+.kotlin/
+build/
+local.properties
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Secretos (por si alguna vez copias tu config aquí)
+config.json
+*.keystore
+*.jks
+
+dashboard/.puerto
+panel/actividad.jsonl
+node_modules/
+.env
+panel/*.tmp
+panel/pregunta*.json
+panel/sesion.json
+panel/mensajes.jsonl
+panel/mensajes-estado.jsonl
+panel/claude.json
+panel/autopiloto.json
+panel/tarea*.json
+panel/prueba.md
