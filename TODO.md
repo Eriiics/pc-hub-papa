@@ -4,3 +4,4 @@
 - [x] T002 Mejorar el control de Excel (f1, alta)
 - [x] T013 El asistente debe poder leer y escribir en Excel (f1, alta)
 - [x] T011 Probar de punta a punta en un PC limpio (cerrada sin probar por decisión del usuario; la prueba P004 queda disponible)
+- [x] T014 Compatibilidad con laptop Samsung y Galaxy S26 Ultra (guía en LEEME; sin probar en los equipos)

@@ -66,6 +66,32 @@ Después, en la pestaña "IA" del teléfono le puedes decir cosas como
 "abre Excel y el archivo de ventas" o "sube el volumen".
 
 
+SI TU TELÉFONO ES SAMSUNG GALAXY
+--------------------------------
+Los Galaxy tienen protecciones que a veces estorban. Si algo no avanza:
+ - No deja instalar PcHub.apk: abre Ajustes -> Seguridad y privacidad ->
+   "Bloqueador automático" (Auto Blocker) y desactívalo mientras instalas.
+   Después lo puedes volver a activar.
+ - Dice "bloqueado por Play Protect": toca "Más detalles" -> "Instalar de todos
+   modos".
+ - Se desconecta del PC o no lo encuentra: en Ajustes -> Conexiones -> Wi-Fi ->
+   (menú de tres puntos) -> Ajustes inteligentes de Wi-Fi, desactiva "Cambiar a
+   datos móviles" y comprueba que el teléfono esté en el MISMO Wi-Fi que el PC.
+ - La app se cierra en segundo plano: en Ajustes -> Aplicaciones -> PC Hub ->
+   Batería, elige "Sin restricciones".
+
+SI TU PC ES UNA LAPTOP SAMSUNG GALAXY BOOK
+------------------------------------------
+ - Funciona igual que cualquier PC con Windows 10 u 11. Si es un modelo "Edge"
+   (procesador Snapdragon) también funciona; el primer arranque puede tardar un
+   poco más.
+ - Si usas "Samsung Settings" o el modo de ahorro de energía, desactiva el
+   ahorro para que el PC no se duerma y corte la conexión.
+ - Si el teléfono no encuentra el PC: clic derecho en el ícono de PC Hub para
+   ver la IP, y escríbela a mano en la app.
+ - En el aviso del firewall elige "Permitir acceso" en redes privadas.
+
+
 CAMBIAR PC HUB CON TU PROPIO CLAUDE
 -----------------------------------
 Dentro del paquete viene "PcHub-Codigo.zip": es el programa completo. Con tu
