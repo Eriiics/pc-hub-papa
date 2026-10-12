@@ -121,13 +121,14 @@ fun NeonTile(
     accent: Color = Neon.Cyan,
     highlighted: Boolean = false,
     badge: String? = null,
+    aspect: Float = 1f,
     onLongClick: (() -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     val haptic = rememberHaptic()
     Box(
         modifier
-            .aspectRatio(1f)
+            .aspectRatio(aspect)
             .glass(RoundedCornerShape(28.dp), tint = if (highlighted) accent else null)
             .combinedClickable(
                 onClick = { haptic(false); onClick() },

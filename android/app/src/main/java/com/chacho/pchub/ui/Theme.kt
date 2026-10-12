@@ -1,9 +1,11 @@
 package com.chacho.pchub.ui
 
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -107,7 +109,10 @@ private val Type = Base.copy(
 @Composable
 fun PcHubTheme(content: @Composable () -> Unit) {
     val colors = remember { scheme() }
-    MaterialTheme(colorScheme = colors, typography = Type, content = content)
+    MaterialTheme(colorScheme = colors, typography = Type) {
+        // Sin esto, los Text sin color propio salen negros sobre las tarjetas oscuras
+        CompositionLocalProvider(LocalContentColor provides Neon.Text, content = content)
+    }
 }
 
 /** Texto en mayúsculas pequeño para encabezados de sección. */

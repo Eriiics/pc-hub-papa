@@ -85,7 +85,7 @@ fun HomeScreen(nav: Nav) {
         MainScreens.chunked(2).forEach { pair ->
             Row(Modifier.fillMaxWidth().padding(bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 pair.forEach { s ->
-                    NeonTile(s.title, Modifier.weight(1f), icon = s.icon, accent = s.accent, highlighted = true) { nav.go(s) }
+                    NeonTile(s.title, Modifier.weight(1f), icon = s.icon, accent = s.accent, highlighted = true, aspect = 1.45f) { nav.go(s) }
                 }
             }
         }

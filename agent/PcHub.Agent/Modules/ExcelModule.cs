@@ -54,6 +54,12 @@ public static class ExcelModule
         {
             throw new InvalidOperationException("Excel está ocupado. Termina de editar la celda o cierra el cuadro que tenga abierto.");
         }
+        catch (COMException ex)
+        {
+            // Cualquier otro error de Excel: un mensaje claro en vez del código (p. ej. 0x800A03EC)
+            Log.Error("Excel: " + ex.HResult.ToString("X"), ex);
+            throw new InvalidOperationException("Excel no pudo hacer eso con lo que está seleccionado. Revisa la celda o el rango e inténtalo de nuevo.");
+        }
     }
 
     // ------------------------------------------------------------------ estado
@@ -104,6 +110,7 @@ public static class ExcelModule
         {
             var app = Requerir();
             var sheet = app.ActiveSheet;
+            if (sheet == null) throw new InvalidOperationException("Excel todavía está abriendo el libro.");
             var active = app.ActiveCell;
             int row = (int)active.Row, col = (int)active.Column;
             // La ventana arranca donde el usuario ya la tiene; si la celda queda fuera, se centra en ella
@@ -197,7 +204,7 @@ public static class ExcelModule
     private static string NombreColumna(int n)
     {
         var s = "";
-        while (n > 0) { n--; s = (char)('A' + n % 26) + s; }
+        while (n > 0) { n--; s = (char)('A' + n % 26) + s; n /= 26; }
         return s;
     }
 
