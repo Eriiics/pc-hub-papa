@@ -21,7 +21,9 @@ PASO 1: instalar en el PC (una sola vez)
 
 PASO 2: instalar en el teléfono (una sola vez)
 ----------------------------------------------
-1. Pasa el archivo "PcHub.apk" al teléfono (cable, Drive, WhatsApp o correo).
+1. Lo más fácil: en el PC, clic derecho en el ícono de PC Hub (junto al reloj) ->
+   "Instalar la app en el teléfono…" y escanea el código con la cámara del
+   teléfono. (O pasa el archivo "PcHub.apk" por cable, Drive, WhatsApp o correo.)
 2. Ábrelo desde el teléfono. Android pedirá permiso para "instalar apps
    desconocidas": acéptalo solo para esa app (Archivos, Drive, etc.).
 3. Abre "PC Hub".

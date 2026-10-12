@@ -29,22 +29,14 @@ fun ModulesScreen(nav: Nav) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             Column(Modifier.padding(bottom = 4.dp)) {
                 Text(
-                    "Todo lo que puedes controlar. Mantén presionado un módulo para fijarlo ★ en Inicio.",
+                    "Todo lo que puedes controlar desde el teléfono.",
                     style = MaterialTheme.typography.bodySmall,
                     color = Neon.TextDim,
                 )
             }
         }
         items(ModuleScreens) { s ->
-            val fav = s.name in Prefs.favorites
-            NeonTile(
-                s.title,
-                icon = s.icon,
-                accent = s.accent,
-                highlighted = fav,
-                badge = if (fav) "★" else null,
-                onLongClick = { Prefs.toggleFavorite(s.name) },
-            ) { nav.go(s) }
+            NeonTile(s.title, icon = s.icon, accent = s.accent) { nav.go(s) }
         }
     }
 }

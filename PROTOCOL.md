@@ -75,6 +75,7 @@ El PIN de 6 dígitos aparece en el menú del ícono de bandeja. Tras 5 intentos 
 | `ai.ask` | `text` | `reply`, `actions` |
 | `ai.reset` | — | — |
 | `ai.confirm` | `id`, `ok` (bool) | — |
+| HTTP `GET /apk` | — (sin PIN; solo en la red local) | La APK de la app (`PcHub.apk`, o `PcHub-Prueba.apk` en una sesión `--prueba`). La usa el QR del menú del ícono. |
 | `app.info` | — | `version` (texto para mostrar), `number` (x.y.z, la app lo compara con la suya y avisa si no coinciden), `installed`, `runningInstalled`, `startup`, `ai` |
 | `excel.status` | — | `installed`, `running`, `workbook?`, `saved`, `sheet`, `sheets`, `cell`, `value`, `formula`, `selection` |
 | `excel.grid` | `rows?` (12), `cols?` (5) | `firstRow`, `firstCol`, `cols` (letras), `rows` (texto de cada celda), `activeRow`, `activeCol` |

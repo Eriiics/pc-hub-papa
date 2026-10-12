@@ -28,6 +28,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación de la app.' }
 } finally { Pop-Location }
 Copy-Item (Join-Path $raiz 'android\app\build\outputs\apk\release\app-release.apk') (Join-Path $salida 'PcHub.apk')
+# Copia dentro del programa del PC: así queda instalada y el ícono puede ofrecer la app al teléfono (QR)
+Copy-Item (Join-Path $salida 'PcHub.apk') (Join-Path $salida 'PcHub-PC\PcHub.apk')
 
 Write-Host "3/3 Guardando el código fuente y las instrucciones…" -ForegroundColor Cyan
 # El código va dentro del paquete para poder cambiar y volver a armar la app con Claude Code.

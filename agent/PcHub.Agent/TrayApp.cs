@@ -34,6 +34,7 @@ public sealed class TrayApp : ApplicationContext
         menu.Items.Add(_pinItem);
         menu.Items.Add(new ToolStripMenuItem("Generar nuevo PIN", null, (_, _) => { _hub.NewPin(); ShowPin(); }));
         menu.Items.Add(_devicesItem);
+        menu.Items.Add(new ToolStripMenuItem("Instalar la app en el teléfono…", null, (_, _) => ApkShare.ShowDialog(_hub.Config.Port)));
         menu.Items.Add(new ToolStripSeparator());
         _installItem = new ToolStripMenuItem("Instalar PC Hub en este PC", null, (_, _) => InstallAgent());
         menu.Items.Add(_installItem);

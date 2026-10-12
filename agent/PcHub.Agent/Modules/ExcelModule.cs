@@ -54,6 +54,11 @@ public static class ExcelModule
         {
             throw new InvalidOperationException("Excel está ocupado. Termina de editar la celda o cierra el cuadro que tenga abierto.");
         }
+        catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+        {
+            // Hoja, celda o libro nulos: Excel está abierto pero sin nada que editar
+            throw new InvalidOperationException("Excel no tiene ninguna hoja abierta. Abre un archivo o crea un libro nuevo.");
+        }
         catch (COMException ex)
         {
             // Cualquier otro error de Excel: un mensaje claro en vez del código (p. ej. 0x800A03EC)
@@ -110,8 +115,8 @@ public static class ExcelModule
         {
             var app = Requerir();
             var sheet = app.ActiveSheet;
-            if (sheet == null) throw new InvalidOperationException("Excel todavía está abriendo el libro.");
             var active = app.ActiveCell;
+            if (sheet == null || active == null) throw new InvalidOperationException("Excel no tiene ninguna hoja abierta. Abre un archivo o crea un libro nuevo.");
             int row = (int)active.Row, col = (int)active.Column;
             // La ventana arranca donde el usuario ya la tiene; si la celda queda fuera, se centra en ella
             int firstRow = Math.Max(1, row - rows / 2), firstCol = Math.Max(1, col - cols / 2);
@@ -143,6 +148,16 @@ public static class ExcelModule
                 ["activeCol"] = col,
             };
         });
+    }
+
+    /// <summary>
+    /// Pone una fórmula tal como la escribe la persona: con los nombres de su Excel (=SUMA en español).
+    /// "Formula" solo entiende inglés y daría #¿NOMBRE?; si FormulaLocal no la acepta, se prueba en inglés (=SUM).
+    /// </summary>
+    private static void PonerFormula(dynamic celda, string formula)
+    {
+        try { celda.FormulaLocal = formula; }
+        catch (COMException) { celda.Formula = formula; }
     }
 
     /// <summary>Lee un rango ("A1:C10", o toda la zona usada si va vacío) como texto, con un máximo de 500 celdas.</summary>
@@ -196,7 +211,7 @@ public static class ExcelModule
             {
                 var v = table[i][j];
                 var target = sheet.Cells[r0 + i, c0 + j];
-                if (v.StartsWith('=')) target.Formula = v; else target.Value2 = v;
+                if (v.StartsWith('=')) PonerFormula(target, v); else target.Value2 = v;
             }
         return Status();
     });
@@ -234,8 +249,7 @@ public static class ExcelModule
         var app = Requerir();
         var a = app.ActiveCell;
         // Los números y fórmulas ("=SUMA(A1:A5)") se interpretan como en Excel; lo demás queda como texto
-        a.Value2 = value.StartsWith('=') ? null : value;
-        if (value.StartsWith('=')) a.Formula = value;
+        if (value.StartsWith('=')) PonerFormula(a, value); else a.Value2 = value;
         int r = (int)a.Row, c = (int)a.Column;
         var sheet = app.ActiveSheet;
         switch (next)

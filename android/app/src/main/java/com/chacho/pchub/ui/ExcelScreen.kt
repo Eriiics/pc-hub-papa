@@ -46,6 +46,9 @@ import org.json.JSONObject
 
 private data class ExcelFile(val name: String, val path: String, val folder: String, val modified: String)
 
+/** ¿Excel tiene un libro abierto? (org.json devuelve el texto "null" para un null del PC, por eso se mira isNull). */
+private fun hasWorkbook(st: JSONObject) = !st.isNull("workbook") && st.optString("workbook").let { it.isNotEmpty() && it != "null" }
+
 /** Excel del PC: ver la hoja, moverte, escribir datos, guardar y abrir archivos recientes. */
 @Composable
 fun ExcelScreen() {
@@ -57,13 +60,13 @@ fun ExcelScreen() {
     var busy by remember { mutableStateOf(false) }
 
     val running = status?.optBoolean("running") == true
-    val hasBook = running && !status!!.isNull("workbook") && status!!.optString("workbook").isNotEmpty()
+    val hasBook = running && status?.let { hasWorkbook(it) } == true
 
     suspend fun refresh() {
         try {
             val st = Pc.call("excel.status")
             status = st
-            if (st.optBoolean("running") && st.optString("workbook").isNotEmpty()) {
+            if (st.optBoolean("running") && hasWorkbook(st)) {
                 grid = Pc.call("excel.grid", JSONObject().put("rows", 12).put("cols", 5))
             } else {
                 grid = null

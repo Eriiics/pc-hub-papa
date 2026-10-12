@@ -92,7 +92,7 @@ private val Examples = listOf(
     "Pon lofi para estudiar en YouTube",
     "Pon Bohemian Rhapsody en YouTube Music",
     "Sube el volumen al 40%",
-    "Abre Discord",
+    "Abre Excel",
     "¿Qué tengo abierto?",
     "Suma la columna B del Excel",
     "Ponle negrita a la fila 1 del Excel",

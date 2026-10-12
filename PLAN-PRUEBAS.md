@@ -24,7 +24,7 @@ Si algo se cuelga: cierra la ventana de PowerShell o ejecuta `Get-Process PcHub.
 
 ## Primera vez (una sola vez)
 
-- `.\Probar-version.ps1 -Apk` arma `PcHub-Prueba.apk`. Pásalo al teléfono e instálalo. Si es un Samsung, mira la sección "SI TU TELÉFONO ES SAMSUNG GALAXY" de `LEEME-PAPA.txt`.
+- `.\Probar-version.ps1 -Apk` arma `PcHub-Prueba.apk`. Con la sesión abierta, clic derecho en el ícono -> "Instalar la app en el teléfono…" y escanea el QR: entrega la app de prueba (no la normal). También puedes pasarlo a mano. Si es un Samsung, mira la sección "SI TU TELÉFONO ES SAMSUNG GALAXY" de `LEEME-PAPA.txt`.
 - Para quitarlo cuando quieras: Ajustes del teléfono -> Aplicaciones -> PC Hub Prueba -> Desinstalar. Y en el PC, borrar la carpeta `%APPDATA%\PcHub-Prueba`.
 
 ## Sesiones sugeridas (15 minutos cada una)

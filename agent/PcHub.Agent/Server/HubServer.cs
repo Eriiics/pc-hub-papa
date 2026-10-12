@@ -55,6 +55,21 @@ public sealed class HubServer : IAsyncDisposable
                 return;
             }
 
+            // La app del teléfono, para instalarla escaneando un QR (ver ApkShare). No contiene PIN ni datos de nadie.
+            if (ctx.Request.Path == "/apk")
+            {
+                var apk = ApkShare.Find();
+                if (apk == null)
+                {
+                    ctx.Response.StatusCode = 404;
+                    return;
+                }
+                ctx.Response.ContentType = "application/vnd.android.package-archive";
+                ctx.Response.Headers["Content-Disposition"] = $"attachment; filename=\"{ApkShare.FileName}\"";
+                await ctx.Response.SendFileAsync(apk);
+                return;
+            }
+
             if (ctx.Request.Path == "/mcp")
             {
                 // Herramientas del PC para Claude Code (solo desde este PC y con token; ver AiModule.ClaudeCode.cs)
