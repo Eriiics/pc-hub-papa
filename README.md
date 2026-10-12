@@ -23,9 +23,24 @@ Abre `LEEME.txt` (viene dentro del paquete): son tres pasos, instalar en el PC, 
 3. Clic derecho en `Crear-paquete.ps1` → *Ejecutar con PowerShell*.
 4. Se crea `PcHub-Paquete/` con `PcHub-PC/` (el programa, con todo incluido: no hay que instalar .NET), `PcHub.apk`, `LEEME.txt`, `ACTUALIZAR.txt` y `PcHub-Codigo.zip` (el código fuente, para cambiar PC Hub con Claude Code), más `PcHub-Paquete-<versión>.zip` listo para pasar por pendrive, Drive o correo.
 
-Para actualizar: vuelve a armar el paquete y pásalo. Al abrir `PcHub.Agent.exe` avisa que hay una versión nueva, cierra la anterior y la reemplaza
-(la configuración y los dispositivos vinculados se conservan). La APK se instala encima porque siempre se firma con `android/pchub.keystore`.
-Si el teléfono y el PC quedan con versiones distintas, la app lo avisa en Inicio.
+Para actualizar: vuelve a armar el paquete (con `VERSION` más alta). Al abrir `PcHub.Agent.exe` avisa que hay una versión nueva, cierra la anterior y la reemplaza
+(la configuración y los dispositivos vinculados se conservan); el instalador también deja la APK nueva junto al programa.
+Después, en el teléfono, Inicio muestra «Actualizar la app ahora»: descarga la APK desde el PC por el Wi-Fi y abre el instalador de Android
+(un toque en «Instalar»; Android no permite saltarse ese toque). La APK se instala encima porque siempre se firma con `android/pchub.keystore`.
+
+## Configuración inicial (para quien le deja esto a otra persona)
+
+Se hace una sola vez, con el teléfono y el PC a mano:
+
+1. Arma el paquete (`Crear-paquete.ps1`) y abre `PcHub-PC\PcHub.Agent.exe` en el PC de él → «Sí» para instalar. Permite el firewall (redes privadas).
+2. Clic derecho en el ícono → *Instalar la app en el teléfono…* y escanea el QR (mismo Wi-Fi). En el teléfono acepta «instalar apps desconocidas»
+   (el mismo permiso sirve después para las actualizaciones) y, en un Samsung, sigue la sección del LEEME (Auto Blocker, Play Protect, batería sin restricciones).
+3. Conecta con el PIN. Clic derecho → *Configurar asistente IA…* → Claude Code.
+4. Instala en su PC lo que necesita Claude para recompilar: .NET 8 SDK, JDK 17 o 21 y el SDK de Android (`Revisar-requisitos.ps1` lo explica), y descomprime
+   `PcHub-Codigo.zip` en una carpeta fija (por ejemplo `Documentos\PcHub-Codigo`). Ahí `CLAUDE.md` ya le dice a su Claude cómo hacer cambios y armar versiones.
+5. Prueba el ciclo completo una vez: pídele a su Claude un cambio pequeño → arma el paquete → abre el `.exe` nuevo → en el teléfono «Actualizar la app ahora».
+
+Después de eso él no necesita cables ni pasar archivos: el teléfono se actualiza solo desde el PC por el Wi-Fi de la casa.
 
 ## Excel
 

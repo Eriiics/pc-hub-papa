@@ -6,3 +6,4 @@
 - [x] T011 Probar de punta a punta en un PC limpio (cerrada sin probar por decisión del usuario; la prueba P004 queda disponible)
 - [x] T014 Compatibilidad con laptop Samsung y Galaxy S26 Ultra (guía en LEEME; sin probar en los equipos)
 - [x] T015 Interfaz estilo Samsung One UI (sin probar en pantalla)
+- [x] T018 La app se actualiza sola desde el PC por Wi-Fi (botón en Inicio), guía de configuración inicial y flujo con Claude (1.1.0; sin probar en teléfono)

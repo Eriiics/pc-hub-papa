@@ -28,13 +28,17 @@ PASO 2: instalar en el teléfono (una sola vez)
    desconocidas": acéptalo solo para esa app (Archivos, Drive, etc.).
 3. Abre "PC Hub".
 
-ACTUALIZAR (cuando recibas una versión nueva)
---------------------------------------------
- - Teléfono: abre el nuevo "PcHub.apk" igual que la primera vez. Se instala
-   ENCIMA de la anterior: no hay que desinstalar nada y no pierdes el PIN.
- - PC: abre el nuevo "PcHub.Agent.exe" y elige "Sí" cuando avise que hay una
-   versión nueva. Cierra la anterior solo, la reemplaza y la vuelve a abrir.
-   No pierdes el PIN ni los teléfonos vinculados.
+ACTUALIZAR (cuando haya una versión nueva)
+-----------------------------------------
+ 1. PC: abre el nuevo "PcHub.Agent.exe" y elige "Sí" cuando avise que hay una
+    versión nueva. Cierra la anterior solo, la reemplaza y la vuelve a abrir.
+ 2. Teléfono (con el Wi-Fi del PC): abre la app. En Inicio saldrá un aviso con
+    el botón "Actualizar la app ahora". Tócalo, espera la descarga y toca
+    "Instalar" cuando Android lo pida. Nada de cables ni de pasar archivos.
+    (La primera vez Android te pedirá dar permiso a PC Hub para instalar: actívalo.)
+ No pierdes el PIN ni los teléfonos vinculados.
+ Si el aviso no sale, usa "Instalar la app en el teléfono…" (clic derecho en el
+ ícono del PC) o pasa "PcHub.apk" a mano.
 
 PASO 3: conectar
 ----------------
@@ -112,7 +116,7 @@ programar.
 5. Cuando termine, instala el resultado igual que una actualización:
    - PC: abre PcHub.Agent.exe (dentro de PcHub-PC, en la carpeta PcHub-Paquete
      nueva) y elige "Sí".
-   - Teléfono: pasa PcHub.apk y ábrelo (se instala encima).
+   - Teléfono: abre la app y toca "Actualizar la app ahora" en Inicio.
 Tu PIN y tus teléfonos vinculados se conservan. Si algo sale mal, dile a Claude
 "vuelve a como estaba antes" y vuelve a armar el paquete.
 

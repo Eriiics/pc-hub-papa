@@ -44,9 +44,10 @@ Copy-Item (Join-Path $raiz 'LEEME-PAPA.txt') (Join-Path $salida 'LEEME.txt')
 @"
 PC Hub ${version}: cómo actualizar (2 minutos)
 =============================================
-1. Teléfono: abre PcHub.apk. Se instala encima de la anterior, sin desinstalar.
-2. PC: abre PcHub-PC\PcHub.Agent.exe y elige "Sí" cuando diga que hay una versión nueva.
+1. PC: abre PcHub-PC\PcHub.Agent.exe y elige "Sí" cuando diga que hay una versión nueva.
    Cierra la anterior, la reemplaza y la abre sola.
+2. Teléfono (mismo Wi-Fi): abre la app y toca "Actualizar la app ahora" en Inicio, luego "Instalar".
+   (Si no sale el aviso: abre PcHub.apk a mano; se instala encima, sin desinstalar.)
 Tu PIN y tus teléfonos vinculados se conservan.
 Si algo falla, mira LEEME.txt.
 "@ | Set-Content (Join-Path $salida 'ACTUALIZAR.txt') -Encoding UTF8

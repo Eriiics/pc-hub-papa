@@ -23,7 +23,7 @@ una persona que sabe usar el computador y el teléfono pero no programa. Usa muc
 
 FL Studio, OBS, el buzón de ideas, la compilación e instalación desde el PC (git/Gradle/adb) y las actualizaciones por GitHub.
 Se agregó el módulo de Excel (`Modules/ExcelModule.cs`, `ui/ExcelScreen.kt`), que controla el Excel abierto por COM.
-La APK se firma siempre con `android/pchub.keystore` (en git, a propósito) y su `versionCode` sale de `VERSION`: sube `VERSION` en cada entrega o Android no la instalará encima. Para actualizar la app: compilar de nuevo con `Crear-paquete.ps1` y pasarle el paquete (el instalador reemplaza la versión anterior).
+La APK se firma siempre con `android/pchub.keystore` (en git, a propósito) y su `versionCode` sale de `VERSION`: sube `VERSION` en cada entrega o Android no la instalará encima. Para actualizar la app: compilar de nuevo con `Crear-paquete.ps1`, abrir el `.exe` nuevo (el instalador reemplaza la versión anterior y deja la APK junto al programa) y en el teléfono tocar «Actualizar la app ahora» (`net/AppUpdater.kt`, descarga `/apk` del PC).
 
 ## Pruebas sin riesgo
 
@@ -42,7 +42,7 @@ La persona que te habla usa mucho Excel y Claude Code pero no programa. Explíca
 2. Sube `VERSION` (por ejemplo de 1.0.0 a 1.0.1). Sin esto Android no instala la APK encima de la anterior.
 3. Ejecuta `./Revisar-requisitos.ps1`. Si falta algo, explícale qué es y ayúdale a instalarlo (suele ser el SDK de .NET 8, un JDK 17/21 o el SDK de Android).
 4. Ejecuta `./Crear-paquete.ps1 -SinAbrir`. Tarda unos minutos y deja `PcHub-Paquete/` y `PcHub-Paquete-<versión>.zip`.
-5. Dile que instale: en el teléfono, abrir `PcHub.apk`; en el PC, abrir `PcHub-PC/PcHub.Agent.exe` y aceptar la actualización. Se conservan el PIN y los teléfonos vinculados.
+5. Abre tú mismo `PcHub-Paquete/PcHub-PC/PcHub.Agent.exe` (`Start-Process`) y dile que acepte la actualización con «Sí». Luego, en el teléfono (mismo Wi-Fi), que abra la app y toque «Actualizar la app ahora» en Inicio y «Instalar» en Android: la app descarga la APK desde el PC (`/apk`). Se conservan el PIN y los teléfonos vinculados. Si el aviso no sale, que use «Instalar la app en el teléfono…» del ícono del PC.
 
 **Reglas que no se rompen:**
 - No cambies versiones de Gradle, AGP, Kotlin ni de librerías, aunque haya avisos.

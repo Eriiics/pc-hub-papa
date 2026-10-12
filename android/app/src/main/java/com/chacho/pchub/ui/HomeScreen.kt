@@ -60,7 +60,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.chacho.pchub.Prefs
+import com.chacho.pchub.net.AppUpdater
 import com.chacho.pchub.net.Pc
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 /** Lo que más se usa, a la vista y en botones grandes. */
@@ -97,7 +99,11 @@ fun HomeScreen(nav: Nav) {
 @Composable
 private fun VersionNotice() {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var message by remember { mutableStateOf<String?>(null) }
+    var phoneIsOlder by remember { mutableStateOf(false) }
+    var working by remember { mutableStateOf(false) }
+    var problem by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(Unit) {
         try {
             val agent = Pc.call("app.info").optString("number")
@@ -114,9 +120,10 @@ private fun VersionNotice() {
             message = when {
                 agent.isEmpty() -> "El programa del PC es más antiguo que esta app. Ábrelo desde la carpeta nueva (PcHub.Agent.exe) para actualizarlo."
                 cmp(agent, app) < 0 -> "El programa del PC (versión $agent) es más antiguo que esta app ($app). Ábrelo desde la carpeta nueva (PcHub.Agent.exe) para actualizarlo."
-                cmp(agent, app) > 0 -> "La app del teléfono (versión $app) es más antigua que el programa del PC ($agent). Instala el PcHub.apk nuevo para actualizarla."
+                cmp(agent, app) > 0 -> "La app del teléfono (versión $app) es más antigua que el programa del PC ($agent)."
                 else -> null
             }
+            phoneIsOlder = cmp(agent, app) > 0
         } catch (_: Exception) {
             // Sin conexión: no se avisa nada
         }
@@ -125,6 +132,25 @@ private fun VersionNotice() {
         GlassCard(Modifier.fillMaxWidth().padding(bottom = 10.dp), glow = Neon.Amber) {
             Text("Hay una actualización pendiente", style = MaterialTheme.typography.titleSmall, color = Neon.Amber)
             Text(it, style = MaterialTheme.typography.bodySmall, color = Neon.Text)
+            if (phoneIsOlder) {
+                Spacer(Modifier.height(8.dp))
+                NeonButton(if (working) "Descargando…" else "Actualizar la app ahora", Modifier.fillMaxWidth(), enabled = !working) {
+                    problem = null
+                    if (!AppUpdater.canInstall(context)) {
+                        problem = "Android necesita que le des permiso a PC Hub para instalar. Actívalo en la pantalla que se abre y vuelve a tocar el botón."
+                        AppUpdater.askPermission(context)
+                    } else {
+                        working = true
+                        scope.launch {
+                            try { AppUpdater.downloadAndInstall(context) }
+                            catch (e: Exception) { problem = e.message ?: "No se pudo actualizar." }
+                            working = false
+                        }
+                    }
+                }
+                Text("Al terminar de descargar, Android te pedirá tocar «Instalar».", style = MaterialTheme.typography.bodySmall, color = Neon.TextFaint)
+            }
+            problem?.let { p -> Text(p, style = MaterialTheme.typography.bodySmall, color = Neon.Amber) }
         }
     }
 }
