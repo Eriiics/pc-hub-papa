@@ -46,3 +46,15 @@ panel/tarea*.json
 panel/prueba.md
 !android/pchub.keystore
 PcHub-Paquete-*.zip
+panel/cierre.log
+panel/verificacion.json
+panel/uso.json
+panel/uso.json.tmp
+panel/ajustes.json
+panel/data.json.bak
+panel/data.json.roto-*
+panel/data.json.lock
+panel/data.json.*.tmp
+panel/servidor-errores.log
+.claude/settings.json.invalido-*.bak
+PcHub-Prueba.apk

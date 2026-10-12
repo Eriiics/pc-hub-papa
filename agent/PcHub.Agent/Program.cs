@@ -10,9 +10,18 @@ internal static class Program
     /// <summary>Se inició solo con Windows (sin mostrar avisos al arrancar).</summary>
     public static bool StartedWithWindows { get; private set; }
 
+    /// <summary>
+    /// Sesión de prueba (<c>--prueba</c>): usa su propia carpeta de datos (%APPDATA%\PcHub-Prueba), no se instala,
+    /// no toca "Iniciar con Windows" y no choca con la copia instalada. Ver PLAN-PRUEBAS.md.
+    /// </summary>
+    public static bool PruebaMode { get; private set; }
+
     [STAThread]
     private static void Main(string[] args)
     {
+        // Antes que nada: la carpeta de datos y el log dependen de este modo
+        PruebaMode = args.Contains("--prueba", StringComparer.OrdinalIgnoreCase);
+
         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
@@ -34,7 +43,7 @@ internal static class Program
         if (!StartedWithWindows && Installer.OfferInstallOrUpdate()) return;
 
         // Al reiniciar tras una actualización, la copia anterior puede tardar un momento en cerrarse
-        using var mutex = new Mutex(false, "PcHub.Agent.Singleton");
+        using var mutex = new Mutex(false, PruebaMode ? "PcHub.Agent.Singleton.Prueba" : "PcHub.Agent.Singleton");
         bool acquired;
         try { acquired = mutex.WaitOne(TimeSpan.FromSeconds(StartedWithWindows ? 1 : 8)); }
         catch (AbandonedMutexException) { acquired = true; }

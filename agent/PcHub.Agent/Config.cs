@@ -126,7 +126,7 @@ public static class ConfigStore
     private static readonly object Lock = new();
 
     public static string Folder { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PcHub");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Program.PruebaMode ? "PcHub-Prueba" : "PcHub");
 
     public static string FilePath => Path.Combine(Folder, "config.json");
 

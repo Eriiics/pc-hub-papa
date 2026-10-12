@@ -25,6 +25,10 @@ FL Studio, OBS, el buzón de ideas, la compilación e instalación desde el PC (
 Se agregó el módulo de Excel (`Modules/ExcelModule.cs`, `ui/ExcelScreen.kt`), que controla el Excel abierto por COM.
 La APK se firma siempre con `android/pchub.keystore` (en git, a propósito) y su `versionCode` sale de `VERSION`: sube `VERSION` en cada entrega o Android no la instalará encima. Para actualizar la app: compilar de nuevo con `Crear-paquete.ps1` y pasarle el paquete (el instalador reemplaza la versión anterior).
 
+## Pruebas sin riesgo
+
+`Probar-version.ps1` abre una sesión de prueba (`PcHub.Agent.exe --prueba`): datos en `%APPDATA%\PcHub-Prueba`, sin instalar ni tocar el inicio con Windows, y en el teléfono la app aparte `com.chacho.pchub.prueba` ("PC Hub Prueba", compilación `assemblePrueba`). Si pruebas algo, usa este modo y no el PC Hub instalado del usuario. Detalle en `PLAN-PRUEBAS.md`.
+
 ## Versiones
 
 - `VERSION` (raíz) es la versión única de la app y del agente (x.y.z). Gradle y el .csproj la leen al compilar.

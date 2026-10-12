@@ -99,17 +99,17 @@ public sealed class TrayApp : ApplicationContext
         if (_installItem != null)
         {
             // Si ya corre la copia instalada no hace falta; desde "dotnet run" ofrece instalar (o reinstalar)
-            _installItem.Visible = !Installer.RunningFromInstall;
+            _installItem.Visible = !Installer.RunningFromInstall && !Program.PruebaMode;
             _installItem.Text = Installer.IsInstalled ? "Instalar esta versión en el PC (reemplaza la instalada)" : "Instalar PC Hub en este PC";
         }
         if (_startupItem != null)
         {
             _startupItem.Checked = Installer.StartupEnabled;
-            _startupItem.Enabled = Installer.IsInstalled;
+            _startupItem.Enabled = Installer.IsInstalled && !Program.PruebaMode;
             _startupItem.ToolTipText = Installer.IsInstalled ? "" : "Primero instala PC Hub";
         }
         _pinItem.Text = $"PIN de emparejamiento: {_hub.Pin}";
-        _tray.Text = $"PC Hub — {_hub.ConnectedCount} conectado(s)";
+        _tray.Text = $"PC Hub{(Program.PruebaMode ? " (PRUEBA)" : "")} — {_hub.ConnectedCount} conectado(s)";
 
         _devicesItem.DropDownItems.Clear();
         var devices = _hub.Config.Devices.ToList();

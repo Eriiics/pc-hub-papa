@@ -54,7 +54,7 @@ public static class Installer
     /// </summary>
     public static bool OfferInstallOrUpdate()
     {
-        if (RunningFromInstall || !IsPublishedBuild) return false;
+        if (Program.PruebaMode || RunningFromInstall || !IsPublishedBuild) return false;
         var installed = InstalledVersion;
         if (installed == null)
         {
@@ -112,6 +112,7 @@ public static class Installer
     /// </summary>
     public static void InstallFromCurrent()
     {
+        if (Program.PruebaMode) return; // una sesión de prueba nunca instala ni cierra tu PC Hub
         try
         {
             // Cerrar la copia instalada si está corriendo
@@ -197,6 +198,7 @@ public static class Installer
     /// <summary>Solo funciona con la copia instalada (la de "dotnet run" no sirve para arrancar con Windows).</summary>
     public static void SetStartup(bool enabled)
     {
+        if (Program.PruebaMode) throw new InvalidOperationException("En una sesión de prueba no se cambia el inicio con Windows.");
         using var key = Registry.CurrentUser.CreateSubKey(RunKey);
         if (enabled)
         {

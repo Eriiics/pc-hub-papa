@@ -20,6 +20,7 @@ android {
         targetSdk = 35
         versionCode = appVersionCode
         versionName = appVersion
+        manifestPlaceholders["appLabel"] = "PC Hub"
     }
 
     // Firma estable: la misma clave (android/pchub.keystore, va en el repositorio) en cualquier PC,
@@ -34,6 +35,14 @@ android {
     }
 
     buildTypes {
+        // "PC Hub Prueba": otra app (com.chacho.pchub.prueba) que convive con la normal y no la reemplaza
+        create("prueba") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".prueba"
+            manifestPlaceholders["appLabel"] = "PC Hub Prueba"
+            signingConfig = signingConfigs.getByName("pchub")
+            matchingFallbacks += "release"
+        }
         release {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("pchub")
