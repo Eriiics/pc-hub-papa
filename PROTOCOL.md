@@ -77,14 +77,14 @@ El PIN de 6 dígitos aparece en el menú del ícono de bandeja. Tras 5 intentos 
 | `ai.confirm` | `id`, `ok` (bool) | — |
 | HTTP `GET /apk` | — (sin PIN; solo en la red local) | La APK de la app (`PcHub.apk`, o `PcHub-Prueba.apk` en una sesión `--prueba`). La usa el QR del menú del ícono. |
 | `app.info` | — | `version` (texto para mostrar), `number` (x.y.z, la app lo compara con la suya y avisa si no coinciden), `installed`, `runningInstalled`, `startup`, `ai` |
-| `excel.status` | — | `installed`, `running`, `workbook?`, `saved`, `sheet`, `sheets`, `cell`, `value`, `formula`, `selection` |
+| `excel.status` | — | `installed`, `running`, `workbook?`, `saved`, `sheet`, `sheets` (solo visibles), `cell`, `value`, `formula`, `selection`, `readOnly?`, `protectedSheet?`, `protectedView?` (archivo en Vista protegida: `workbook` trae su nombre y no hay hoja editable) |
 | `excel.grid` | `rows?` (12), `cols?` (5) | `firstRow`, `firstCol`, `cols` (letras), `rows` (texto de cada celda), `activeRow`, `activeCol` |
 | `excel.select` | `cell` ("B7") o `dRow`, `dCol` (relativo a la celda activa) | estado |
 | `excel.write` | `value` (texto, número o fórmula con `=`), `next` = `down`/`right`/`none` | estado |
-| `excel.action` | `a` = `save` `undo` `clear` `bold` `autosum` `filter` `next_sheet` `prev_sheet` `new_sheet` `copy` `cut` `paste` `home` `jump_up` `jump_down` `jump_left` `jump_right` (como Ctrl+flecha) `insert_row` `delete_row` `autofit` `percent` `money` `number` | estado |
+| `excel.action` | `a` = `save` `undo` `clear` `bold` `autosum` `filter` `next_sheet` `prev_sheet` `new_sheet` `copy` `cut` `paste` `home` `jump_up` `jump_down` `jump_left` `jump_right` (como Ctrl+flecha) `insert_row` `delete_row` `autofit` `percent` `money` `number` `escape` `enable_edit` (equivale a «Habilitar edición» de la Vista protegida). `undo` usa un historial propio (escrituras, borrar, negrita, formatos, filas) y, si está vacío, el de Excel | estado |
 | `excel.sheet` | `name` | estado |
 | `excel.files` | — | `files: [{path,name,folder,modified}]` (Recientes, Documentos, Escritorio y Descargas) |
-| `excel.open` | `path` (.xlsx/.xlsm/.xls/.csv) | `opening` |
+| `excel.open` | `path` (.xlsx/.xlsm/.xls/.csv) | `opening` (false si Excel lo abrió por COM; `already` si ya estaba abierto y solo se mostró) |
 | `excel.new` | — | estado (abre Excel con un libro en blanco) |
 | `app.startup` | `enabled` (bool) | igual que `app.info` |
 | `yt.search` | `q`, `music` (bool) | `results: [{id,title,channel,duration,views,thumb}]` |

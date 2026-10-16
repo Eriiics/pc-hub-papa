@@ -47,7 +47,7 @@ import org.json.JSONObject
 private data class ExcelFile(val name: String, val path: String, val folder: String, val modified: String)
 
 /** ¿Excel tiene un libro abierto? (org.json devuelve el texto "null" para un null del PC, por eso se mira isNull). */
-private fun hasWorkbook(st: JSONObject) = !st.isNull("workbook") && st.optString("workbook").let { it.isNotEmpty() && it != "null" }
+private fun hasWorkbook(st: JSONObject) = !st.optBoolean("protectedView") && !st.isNull("workbook") && st.optString("workbook").let { it.isNotEmpty() && it != "null" }
 
 /** Excel del PC: ver la hoja, moverte, escribir datos, guardar y abrir archivos recientes. */
 @Composable
@@ -113,6 +113,13 @@ fun ExcelScreen() {
                 } else if (status?.optBoolean("installed") == false) {
                     Text("No encontré Excel en este PC", style = MaterialTheme.typography.titleMedium, color = Neon.Text)
                     Text("Instala Microsoft Excel en el PC para usar esta pantalla.", style = MaterialTheme.typography.bodySmall, color = Neon.TextDim)
+                } else if (status?.optBoolean("protectedView") == true) {
+                    Text(status?.optString("workbook").orEmpty().ifEmpty { "Archivo" }, style = MaterialTheme.typography.titleMedium, color = Neon.Text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text("Está en Vista protegida (Excel lo marca así cuando viene de internet o de un correo). Para poder verlo y editarlo hay que habilitar la edición.", style = MaterialTheme.typography.bodySmall, color = Neon.TextDim)
+                    Spacer(Modifier.height(10.dp))
+                    NeonButton("Habilitar edición", Modifier.fillMaxWidth(), accent = Neon.Lime) {
+                        call("excel.action", JSONObject().put("a", "enable_edit"))
+                    }
                 } else if (!hasBook) {
                     Text(
                         if (running) "Excel está abierto, pero sin ningún archivo" else "Excel no está abierto",
@@ -133,6 +140,10 @@ fun ExcelScreen() {
                         style = MaterialTheme.typography.labelSmall,
                         color = if (saved) Neon.Lime else Neon.Amber,
                     )
+                    if (status?.optBoolean("readOnly") == true)
+                        Text("Solo lectura: puedes mirar, pero guardar hay que hacerlo con «Guardar como» en el PC.", style = MaterialTheme.typography.labelSmall, color = Neon.Amber)
+                    if (status?.optBoolean("protectedSheet") == true)
+                        Text("Esta hoja está protegida: algunas celdas no se pueden cambiar.", style = MaterialTheme.typography.labelSmall, color = Neon.Amber)
                     val sheets = status?.optJSONArray("sheets")
                     if (sheets != null && sheets.length() > 1) {
                         Spacer(Modifier.height(8.dp))

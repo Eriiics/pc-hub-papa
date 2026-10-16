@@ -28,6 +28,13 @@ internal static class Program
 
         Log.Init();
 
+        // Autoprueba del módulo de Excel contra un Excel real (para quien arma versiones; no abre la bandeja)
+        if (args.Contains("--autoprueba-excel", StringComparer.OrdinalIgnoreCase))
+        {
+            Environment.ExitCode = ExcelSelfTest.Run();
+            return;
+        }
+
         // Si PC Hub se abrió desde otra app que define esta variable (p. ej. Claude), los programas que lanza
         // (cmd, gradlew, scripts) no encontrarían archivos de su propia carpeta. Se quita para todo lo que se ejecute.
         Environment.SetEnvironmentVariable("NoDefaultCurrentDirectoryInExePath", null);
