@@ -2,6 +2,7 @@ package com.chacho.pchub.ui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Home
@@ -51,6 +52,7 @@ enum class Screen(
     System("Sistema", Tab.Modules, Icons.Filled.PowerSettingsNew, NeonRaw.Amber, "Energía y portapapeles"),
     Terminal("Terminal", Tab.Modules, Icons.Filled.Terminal, NeonRaw.Lime, "PowerShell completa, también en el PC", module = false),
     Excel("Excel", Tab.Modules, Icons.Filled.TableChart, NeonRaw.Lime, "Ver la hoja, escribir y guardar"),
+    Mejoras("Mejoras", Tab.Modules, Icons.Filled.AutoFixHigh, NeonRaw.Violet, "Pídele cambios a tu Claude"),
     Settings("Ajustes", Tab.Modules, Icons.Filled.Settings, NeonRaw.TextDim, "Tu PC y el mouse"),
     ;
 
@@ -71,6 +73,7 @@ fun moduleToScreen(module: String?): Screen? = when (module?.lowercase()) {
     "system", "sistema" -> Screen.System
     "ai", "ia" -> Screen.Ai
     "excel" -> Screen.Excel
+    "mejoras" -> Screen.Mejoras
     "terminal" -> Screen.Terminal
     else -> null
 }

@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import com.chacho.pchub.Prefs
 import com.chacho.pchub.net.AppUpdater
 import com.chacho.pchub.net.Pc
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -91,6 +92,10 @@ fun HomeScreen(nav: Nav) {
                 }
             }
         }
+        GlassCard(Modifier.fillMaxWidth().padding(bottom = 10.dp), glow = Neon.Violet, onClick = { nav.go(Screen.Mejoras) }) {
+            Text("¿Quieres cambiar algo de PC Hub?", style = MaterialTheme.typography.titleSmall, color = Neon.Text)
+            Text("Pídeselo a tu Claude: anota lo que quieres y él lo programa e instala.", style = MaterialTheme.typography.bodySmall, color = Neon.TextDim)
+        }
         Spacer(Modifier.height(24.dp))
     }
 }
@@ -104,28 +109,36 @@ private fun VersionNotice() {
     var phoneIsOlder by remember { mutableStateOf(false) }
     var working by remember { mutableStateOf(false) }
     var problem by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(Unit) {
-        try {
-            val agent = Pc.call("app.info").optString("number")
-            val app = context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
-            fun parts(v: String) = v.split('.').map { it.toIntOrNull() ?: 0 }
-            fun cmp(a: String, b: String): Int {
-                val x = parts(a); val y = parts(b)
-                for (i in 0 until maxOf(x.size, y.size)) {
-                    val d = x.getOrElse(i) { 0 }.compareTo(y.getOrElse(i) { 0 })
-                    if (d != 0) return d
+    val status by Pc.status.collectAsState()
+    // Se vuelve a revisar al conectarse (por ejemplo después de actualizar el PC) y cada 20 segundos
+    LaunchedEffect(status) {
+        if (status != Pc.Status.Connected) return@LaunchedEffect
+        while (true) {
+            try {
+                val info = Pc.call("app.info")
+                val agent = info.optString("number")
+                val app = context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
+                fun parts(v: String) = v.split('.').map { it.toIntOrNull() ?: 0 }
+                fun cmp(a: String, b: String): Int {
+                    val x = parts(a); val y = parts(b)
+                    for (i in 0 until maxOf(x.size, y.size)) {
+                        val d = x.getOrElse(i) { 0 }.compareTo(y.getOrElse(i) { 0 })
+                        if (d != 0) return d
+                    }
+                    return 0
                 }
-                return 0
+                val c = if (agent.isEmpty()) -1 else cmp(agent, app)
+                phoneIsOlder = c > 0
+                message = when {
+                    c > 0 -> "Hay una versión nueva de PC Hub: tu teléfono tiene la $app y el PC ya tiene la $agent."
+                    c < 0 -> "El teléfono tiene la versión $app, pero el programa del PC es más antiguo (${agent.ifEmpty { "desconocida" }}). " +
+                        "En el PC abre el PcHub.Agent.exe de la carpeta nueva y elige «Sí» para actualizarlo."
+                    else -> null
+                }
+            } catch (_: Exception) {
+                // Sin conexión: se conserva lo último que se supo
             }
-            message = when {
-                agent.isEmpty() -> "El programa del PC es más antiguo que esta app. Ábrelo desde la carpeta nueva (PcHub.Agent.exe) para actualizarlo."
-                cmp(agent, app) < 0 -> "El programa del PC (versión $agent) es más antiguo que esta app ($app). Ábrelo desde la carpeta nueva (PcHub.Agent.exe) para actualizarlo."
-                cmp(agent, app) > 0 -> "La app del teléfono (versión $app) es más antigua que el programa del PC ($agent)."
-                else -> null
-            }
-            phoneIsOlder = cmp(agent, app) > 0
-        } catch (_: Exception) {
-            // Sin conexión: no se avisa nada
+            delay(20_000)
         }
     }
     message?.let {

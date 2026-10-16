@@ -42,7 +42,8 @@ public sealed class TrayApp : ApplicationContext
         menu.Items.Add(_startupItem);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(new ToolStripMenuItem("Configurar asistente IA…", null, (_, _) => OpenAiSetup()));
-        menu.Items.Add(new ToolStripMenuItem("Mejorar PC Hub con mi Claude…", null, (_, _) => OpenImprove()));
+        menu.Items.Add(new ToolStripMenuItem("Pedir una mejora a mi Claude…", null, (_, _) => MejorasDialog.ShowSingle(_hub)));
+        menu.Items.Add(new ToolStripMenuItem("Abrir Claude con el código (avanzado)…", null, (_, _) => OpenImprove()));
         menu.Items.Add(new ToolStripMenuItem("Abrir configuración (config.json)", null, (_, _) => OpenConfig()));
         menu.Items.Add(new ToolStripMenuItem("Abrir carpeta de datos y log", null, (_, _) => Shell(ConfigStore.Folder)));
         menu.Items.Add(new ToolStripSeparator());

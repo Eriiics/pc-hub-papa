@@ -31,6 +31,7 @@ public sealed class Hub : IAsyncDisposable
     public FocusWatcher Focus { get; }
     public CommandModule Commands { get; }
     public AiModule Ai { get; }
+    public MejorasModule Mejoras { get; }
     public TerminalModule Terminal { get; }
     /// <summary>Aviso corto para mostrar en la bandeja.</summary>
     public event Action<string>? TrayMessage;
@@ -51,6 +52,9 @@ public sealed class Hub : IAsyncDisposable
         Config = config;
         PowerShellRunner.UseProfile = config.PowerShellUseProfile;
         NewPin();
+        Mejoras = new MejorasModule(this);
+        Mejoras.Output += line => Broadcast("mejoras.log", new JsonObject { ["line"] = line });
+        Mejoras.StateChanged += state => Broadcast("mejoras.run", state);
         Media = new MediaModule(state => Broadcast("media.state", state));
         Context = new ContextWatcher(config, ctx => Broadcast("ctx.changed", ctx));
         Focus = new FocusWatcher(f => Broadcast("input.focus", f));
@@ -311,6 +315,19 @@ public sealed class Hub : IAsyncDisposable
             Installer.SetStartup(B(p, "enabled"));
             return AppInfo();
         });
+
+        // Mejoras: lista de peticiones para su Claude (ver MejorasModule)
+        On("mejoras.list", _ => Mejoras.ListJson());
+        On("mejoras.add", p => Mejoras.Add(S(p, "text")));
+        On("mejoras.update", p => Mejoras.Update(S(p, "id"), p["text"] != null ? S(p, "text") : null, p["status"] != null ? S(p, "status") : null));
+        On("mejoras.delete", p => { Mejoras.Delete(S(p, "id")); return null; });
+        On("mejoras.answer", p => Mejoras.Answer(S(p, "id"), S(p, "answers")));
+        On("mejoras.run.status", _ => Mejoras.StatusJson());
+        On("mejoras.run.start", p => Mejoras.Start(p["ids"] is JsonArray arr ? arr.Select(n => n?.ToString() ?? "").ToList() : null));
+        On("mejoras.run.cancel", _ => Mejoras.Cancel());
+        On("mejoras.run.clear", _ => { Mejoras.ClearError(); return Mejoras.StatusJson(); });
+        On("mejoras.install", _ => Mejoras.Install());
+        On("mejoras.undo", p => Mejoras.Undo(S(p, "id")));
 
         // Excel
         On("excel.status", _ => ExcelModule.Status(), detached: true);

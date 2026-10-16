@@ -84,6 +84,7 @@ if (Test-Path $Bundle) {
             git -C $carpeta merge refs/remotes/entrega/main --no-edit -m 'Actualización recibida' *> $null
             if ($LASTEXITCODE -ne 0) {
                 Aviso 'La actualización y tus cambios tocaron las mismas líneas. Claude lo va a resolver contigo.'
+                if ($SoloActualizar) { exit 3 } # el programa de la bandeja se lo pasa a Claude
                 $pedirConflictos = 'Acabo de recibir una actualización de PC Hub y chocó con mis cambios (git merge con conflictos). ' +
                     'Resuélvelos conservando LO QUE YO PEDÍ ANTES y también lo nuevo de la actualización; si es VERSION, deja el número más alto. ' +
                     'Cuando termines, haz git add -A y el commit de la mezcla, explícame en sencillo qué decidiste y pregúntame si armo el paquete nuevo.'

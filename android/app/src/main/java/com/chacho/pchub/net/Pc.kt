@@ -59,6 +59,10 @@ object Pc {
     /** Cambios de una pestaña de terminal: id, title, running, onPc (o closed = true). */
     val termState = MutableSharedFlow<JSONObject>(extraBufferCapacity = 64)
 
+    /** Mejoras (peticiones a su Claude): cambió la lista, estado del trabajo y registro en vivo. */
+    val mejorasChanged = MutableSharedFlow<Unit>(extraBufferCapacity = 8)
+    val mejorasRun = MutableStateFlow<JSONObject?>(null)
+
     private var ws: WebSocket? = null
     @Volatile private var generation = 0
     private val nextId = AtomicInteger(1)
@@ -231,6 +235,8 @@ object Pc {
                     "input.focus" -> textFocus.tryEmit(d)
                     "ai.step" -> aiSteps.tryEmit(d.optString("text"))
                     "ai.confirm_req" -> confirm.value = d
+                    "mejoras.changed" -> mejorasChanged.tryEmit(Unit)
+                    "mejoras.run" -> mejorasRun.value = d
                     "term.out" -> termOut.tryEmit(d.optString("id") to d.optString("data"))
                     "term.state" -> termState.tryEmit(d)
                     "term.closed" -> termState.tryEmit(JSONObject().put("id", d.optString("id")).put("closed", true))

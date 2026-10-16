@@ -258,6 +258,7 @@ fun moduleEmoji(s: Screen): String = when (s) {
     Screen.Apps -> "📦"
     Screen.System -> "⚡"
     Screen.Excel -> "📊"
+    Screen.Mejoras -> "🛠️"
     Screen.Terminal -> "💻"
     Screen.Settings -> "⚙️"
     else -> "•"

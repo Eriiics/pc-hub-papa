@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -66,9 +67,11 @@ public static class Installer
         var current = typeof(Installer).Assembly.GetName().Version ?? new Version(0, 0, 0);
         var cur = new Version(current.Major, current.Minor, Math.Max(0, current.Build));
         var inst = new Version(installed.Major, installed.Minor, Math.Max(0, installed.Build));
+        // --actualizar: lo abre PC Hub mismo tras armar una mejora; ya se pidió desde el teléfono, no se vuelve a preguntar
+        bool sinPreguntar = Environment.GetCommandLineArgs().Contains("--actualizar", StringComparer.OrdinalIgnoreCase);
         if (cur > inst)
         {
-            if (MessageBox.Show($"Hay una versión nueva de PC Hub ({cur}). Tienes la {inst}.\n\n¿Actualizar ahora? Tu PIN y tus teléfonos vinculados se conservan.",
+            if (sinPreguntar || MessageBox.Show($"Hay una versión nueva de PC Hub ({cur}). Tienes la {inst}.\n\n¿Actualizar ahora? Tu PIN y tus teléfonos vinculados se conservan.",
                     AppName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 InstallFromCurrent();

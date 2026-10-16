@@ -172,6 +172,7 @@ private fun MainUi(reconnecting: Boolean) {
                     Screen.System -> SystemScreen()
                     Screen.Terminal -> TerminalScreen()
                     Screen.Excel -> ExcelScreen()
+                    Screen.Mejoras -> MejorasScreen()
                     Screen.Settings -> SettingsScreen()
                 }
             }
