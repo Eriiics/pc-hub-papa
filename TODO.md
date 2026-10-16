@@ -17,3 +17,4 @@
 - [x] T026 Mejoras: Claude las hace una a una o todas, arma el paquete e instala; preguntas, cancelar y deshacer
 - [x] T027 Repositorio conectado: las actualizaciones de Eric se mezclan solas con los cambios de su Claude
 - [x] T028 Prueba 1.3.0: el teléfono tenía una app anterior sin Mejoras; se instala por QR (la actualización dentro de la app existe desde la 1.1.0)
+- [x] T029 Instalar y actualizar la app por depuración inalámbrica (adb en el paquete; automático; sin probar con teléfono real)
