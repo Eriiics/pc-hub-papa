@@ -22,13 +22,15 @@ public static class ApkShare
     /// <summary>Esquema del enlace que abre la app del teléfono ya emparejada (distinto en la app de prueba).</summary>
     public static string Scheme => Program.PruebaMode ? "pchubprueba" : "pchub";
 
-    private static string? _setupKey;
-    private static DateTime _setupUntil;
+    private static string? _setupKey = Program.PruebaMode ? Environment.GetEnvironmentVariable("PCHUB_CLAVE_INSTALAR") : null;
+    private static DateTime _setupUntil = DateTime.UtcNow.AddMinutes(20);
 
     /// <summary>Clave de un solo uso (vive 20 minutos) que va dentro del QR y abre la página de instalación con el PIN.</summary>
     public static string NewSetupKey()
     {
         _setupKey = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(8)).ToLowerInvariant();
+        // Solo en la sesión de prueba: permite abrir la página sin el QR para comprobarla desde una terminal
+        if (Program.PruebaMode && Environment.GetEnvironmentVariable("PCHUB_CLAVE_INSTALAR") is { Length: > 0 } fija) _setupKey = fija;
         _setupUntil = DateTime.UtcNow.AddMinutes(20);
         return _setupKey;
     }
