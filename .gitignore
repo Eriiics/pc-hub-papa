@@ -58,3 +58,8 @@ panel/data.json.*.tmp
 panel/servidor-errores.log
 .claude/settings.json.invalido-*.bak
 PcHub-Prueba.apk
+.claude/settings.local.json
+panel/recuperacion.json
+# Canal de la terminal (T074/T078): el archivo lleva el token de la sesión; no debe subirse nunca
+panel/pty.json*
+panel/pty-arranque.txt

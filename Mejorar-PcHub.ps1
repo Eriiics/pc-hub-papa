@@ -7,7 +7,7 @@
 #
 # Uso: doble clic en "Mejorar PC Hub con Claude.bat" (o clic derecho en este archivo -> Ejecutar con PowerShell)
 param([string]$Bundle, [switch]$SoloActualizar)
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Continue' # los avisos de git salen por stderr: se revisa $LASTEXITCODE a mano
 $aqui = $PSScriptRoot
 if (-not $Bundle) { $Bundle = Join-Path $aqui 'PcHub-Codigo.bundle' }
 $carpeta = if ($env:PCHUB_CARPETA_CODIGO) { $env:PCHUB_CARPETA_CODIGO } else { Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'PcHub-Codigo' }
@@ -51,7 +51,7 @@ if (-not $SoloActualizar -and $LASTEXITCODE -ne 0) {
 if (-not (Test-Path (Join-Path $carpeta '.git'))) {
     if (-not (Test-Path $Bundle)) { Salir "No encuentro $Bundle (el código de PC Hub que viene en el paquete)." }
     Paso "Preparando el código en $carpeta (solo la primera vez)…"
-    git clone --quiet $Bundle $carpeta
+    git clone --quiet --branch main $Bundle $carpeta 2>$null
     if ($LASTEXITCODE -ne 0) { Salir 'No pude copiar el código.' }
     git -C $carpeta checkout --quiet -b papa
     git -C $carpeta remote rename origin entrega
