@@ -5,9 +5,9 @@
 > Después solo contesta lo que te pregunte y acepta los permisos de Windows cuando salgan.
 
 ```
-REPO_URL: https://github.com/PON-AQUI-EL-USUARIO/PON-AQUI-EL-REPOSITORIO.git
+REPO_URL: https://github.com/Eriiics/pc-hub-papa.git
 ```
-*(Eric: cambia la línea de arriba por la dirección del repositorio de GitHub antes de pasar este archivo. Si se queda así, Claude le preguntará la dirección a la persona.)*
+*(Si esa línea cambia o dice `PON-AQUI`, Claude le pedirá la dirección a la persona.)*
 
 ---
 
