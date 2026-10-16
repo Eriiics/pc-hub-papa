@@ -86,6 +86,19 @@ El PIN de 6 dígitos aparece en el menú del ícono de bandeja. Tras 5 intentos 
 | `excel.files` | — | `files: [{path,name,folder,modified}]` (Recientes, Documentos, Escritorio y Descargas) |
 | `excel.open` | `path` (.xlsx/.xlsm/.xls/.csv) | `opening` (false si Excel lo abrió por COM; `already` si ya estaba abierto y solo se mostró) |
 | `excel.new` | — | estado (abre Excel con un libro en blanco) |
+| `mejoras.list` | — | `mejoras: [{id,text,status,note,commit,created,updated}]` (status: `nueva` `en_curso` `con_preguntas` `lista` `hecha` `con_problema` `descartada`) |
+| `mejoras.add` | `text` | la mejora |
+| `mejoras.update` | `id`, `text?`, `status?` | la mejora |
+| `mejoras.delete` | `id` | — |
+| `mejoras.answer` | `id`, `answers` (respuesta a la pregunta de Claude) | la mejora (vuelve a `nueva`) |
+| `mejoras.run.start` | `ids?` (sin ids = todas las nuevas) | estado del trabajo |
+| `mejoras.run.status` | — | `state` (`libre` `trabajando` `compilando` `listo` `error`), `step`, `error`, `done`, `total`, `version` (si `listo`), `prueba`, `log` |
+| `mejoras.run.cancel` / `mejoras.run.clear` | — | estado (clear quita un error) |
+| `mejoras.sync` | — | estado: mezcla las actualizaciones de Eric (`PcHub-Codigo.bundle`) con el código de la persona y arma la versión combinada |
+| `mejoras.install` | — | `installing`: abre el `PcHub.Agent.exe` nuevo con `--actualizar` (se instala sin preguntar y reinicia) |
+| `mejoras.undo` | `id` | estado: `git revert` de esa mejora y versión nueva sin ella |
+
+Eventos de Mejoras: `mejoras.changed` (cambió la lista), `mejoras.run` (estado, como `mejoras.run.status`) y `mejoras.log` (`line`).
 | `app.startup` | `enabled` (bool) | igual que `app.info` |
 | `yt.search` | `q`, `music` (bool) | `results: [{id,title,channel,duration,views,thumb}]` |
 | `yt.play` | `id`, `list` (opcional; sin `id` = la lista completa), `music` (bool). Con `music` se abre en la app (PWA) de YouTube Music y, si hay un video de YouTube sonando, se pausa | `message` |

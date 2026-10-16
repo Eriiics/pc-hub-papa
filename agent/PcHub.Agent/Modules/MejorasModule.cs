@@ -60,7 +60,7 @@ public sealed class MejorasModule
             if (pend.Version != "" && Version.TryParse(pend.Version, out var pv) && Version.TryParse(Installer.Number, out var cur) && cur >= pv)
             {
                 foreach (var m in all.Where(m => m.Status == "lista")) { m.Status = "hecha"; changed = true; }
-                SaveEstado(new Estado());
+                SaveEstado(new Estado { BundleVisto = pend.BundleVisto });
             }
             if (changed) Save(all);
         }
@@ -75,6 +75,8 @@ public sealed class MejorasModule
     {
         public string Version { get; set; } = "";
         public string Exe { get; set; } = "";
+        /// <summary>Fecha (ticks UTC) del PcHub-Codigo.bundle que ya se mezcló con el código de la persona.</summary>
+        public long BundleVisto { get; set; }
     }
 
     private static Estado LoadEstado()
@@ -361,7 +363,7 @@ public sealed class MejorasModule
                 }
                 else
                 {
-                    var resumen = res.Success ? res.Groups[1].Value.Trim() : Corto(text, 400);
+                    var resumen = res.Success ? res.Groups[1].Value.Trim() : Corto(text.Split((char)10, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? text, 300);
                     await GitAsync(repo, ct, "add", "-A");
                     await GitAsync(repo, ct, "commit", "--quiet", "-m", "Mejora: " + Corto(m.Text, 70) + "\n\n" + resumen);
                     var sha = (await GitAsync(repo, ct, "rev-parse", "--short", "HEAD")).Trim();
@@ -437,7 +439,7 @@ Reglas de este trabajo:
 - Si agregas un método teléfono-PC, anótalo en PROTOCOL.md. Si cambia algo que la persona ve, actualiza LEEME-PAPA.txt.
 - NO subas VERSION, NO hagas git commit y NO armes el paquete: el programa lo hace después.
 - Si te falta información imprescindible, no adivines: no cambies nada y termina con una línea que empiece por «PREGUNTAS:» con preguntas cortas y claras.
-- Si lo lograste, termina con una línea que empiece por «RESUMEN:» y cuenta en una o dos frases sencillas qué cambió (sin jerga).");
+- Si lo lograste, tu ÚLTIMA línea debe empezar por «RESUMEN:» y contar en una o dos frases sencillas qué cambió, como si se lo explicaras a alguien que no programa (sin nombres de archivos ni jerga, y sin repetir estas reglas).");
         return sb.ToString();
     }
 
@@ -477,7 +479,7 @@ Reglas de este trabajo:
         {
             UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true,
             StandardOutputEncoding = Encoding.UTF8,
-            Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{script}\" {args}",
+            Arguments = "-NoProfile -ExecutionPolicy Bypass -Command \"[Console]::OutputEncoding=[Text.Encoding]::UTF8; & '" + script.Replace("'", "''") + "' " + args + "; exit $LASTEXITCODE\"",
         };
         psi.Environment["PCHUB_CARPETA_CODIGO"] = repo;
         using var p = new Process { StartInfo = psi };
@@ -626,7 +628,7 @@ Reglas de este trabajo:
             var exe = Path.Combine(repo, "PcHub-Paquete", "PcHub-PC", "PcHub.Agent.exe");
             if (code == 0 && File.Exists(exe))
             {
-                SaveEstado(new Estado { Version = nueva, Exe = exe });
+                SaveEstado(new Estado { Version = nueva, Exe = exe, BundleVisto = LoadEstado().BundleVisto });
                 Emit($"✔ Versión {nueva} lista para instalar");
                 _error = "";
                 SetState("libre", "");
@@ -652,7 +654,7 @@ Reglas de este trabajo:
             UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true,
             StandardOutputEncoding = Encoding.UTF8, StandardErrorEncoding = Encoding.UTF8,
             WorkingDirectory = repo,
-            Arguments = "-NoProfile -ExecutionPolicy Bypass -File \"" + Path.Combine(repo, "Crear-paquete.ps1") + "\" -SinAbrir",
+            Arguments = "-NoProfile -ExecutionPolicy Bypass -Command \"[Console]::OutputEncoding=[Text.Encoding]::UTF8; & '" + Path.Combine(repo, "Crear-paquete.ps1").Replace("'", "''") + "' -SinAbrir; exit $LASTEXITCODE\"",
         };
         var all = new List<string>();
         using var p = new Process { StartInfo = psi };
@@ -674,6 +676,60 @@ Reglas de este trabajo:
         finally { _proc = null; }
         string tail; lock (all) tail = string.Join("\n", all.TakeLast(60));
         return (p.ExitCode, tail);
+    }
+
+    private static string? BundlePath()
+    {
+        var script = FindScript();
+        var b = script == null ? null : Path.Combine(Path.GetDirectoryName(script)!, "PcHub-Codigo.bundle");
+        return b != null && File.Exists(b) ? b : null;
+    }
+
+    /// <summary>
+    /// ¿Llegó una actualización (PcHub-Codigo.bundle más nuevo que el último mezclado) y ya existe la carpeta del código?
+    /// Si sí, se mezcla con los cambios de su Claude y se arma la versión combinada, sin que la persona haga nada.
+    /// </summary>
+    public bool AutoSyncPendiente()
+    {
+        var b = BundlePath();
+        return b != null && !Program.PruebaMode && Directory.Exists(Path.Combine(CodeFolder, ".git"))
+               && File.GetLastWriteTimeUtc(b).Ticks > LoadEstado().BundleVisto;
+    }
+
+    /// <summary>Mezcla las actualizaciones de Eric con el código de la persona; si algo cambió, arma la versión combinada.</summary>
+    public JsonObject Sync()
+    {
+        if (Busy) throw new InvalidOperationException("Claude está trabajando. Espera a que termine.");
+        _cts = new CancellationTokenSource();
+        var ct = _cts.Token;
+        _error = ""; _done = 0; _total = 0;
+        lock (_log) _log.Clear();
+        SetState("trabajando", "Revisando si llegó una actualización…");
+        _task = Task.Run(async () =>
+        {
+            try
+            {
+                var repo = CodeFolder;
+                var antes = Directory.Exists(Path.Combine(repo, ".git")) ? (await GitAsync(repo, ct, "rev-parse", "HEAD")).Trim() : "";
+                await EnsureCodeAsync(ct);
+                var despues = (await GitAsync(repo, ct, "rev-parse", "HEAD")).Trim();
+                var b = BundlePath();
+                var est = LoadEstado();
+                if (b != null) { est.BundleVisto = File.GetLastWriteTimeUtc(b).Ticks; SaveEstado(est); }
+                if (antes != despues)
+                {
+                    var exe = AiModule.FindClaude(_hub.Config.Ai.ClaudeCodePath) ?? "";
+                    Emit("▶ La actualización de Eric se mezcló con tus cambios. Armando la versión combinada…");
+                    await BuildAsync(repo, exe, ct);
+                    _hub.NotifyTray("Llegó una actualización y ya se mezcló con tus cambios. Falta instalarla (Pedir una mejora… → Instalar).");
+                }
+                else SetState("libre", "");
+            }
+            catch (OperationCanceledException) { SetState("libre", ""); }
+            catch (Falla f) { _error = f.Message; Emit("✖ " + f.Message); SetState("error", ""); }
+            catch (Exception ex) { Log.Error("Mejoras: sincronizar", ex); _error = "Hubo un error inesperado: " + ex.Message; SetState("error", ""); }
+        });
+        return StatusJson();
     }
 
     /// <summary>Abre el PcHub.Agent.exe nuevo: se instala solo (sin preguntar) y se reinicia con la versión nueva.</summary>

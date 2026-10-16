@@ -12,3 +12,7 @@
 - [x] T020 Cuenta de Claude: el diálogo del asistente instala Claude Code e inicia sesión (en el PC); «Mejorar PC Hub con mi Claude…» en el ícono
 - [x] T021 Instalación y actualización fáciles (QR + botón «Actualizar la app ahora» + guías)
 - [x] T023 Repositorio: bundle de git, rama «papa» y mezcla de actualizaciones sin perder sus cambios (Mejorar-PcHub.ps1)
+- [x] T024 El aviso de versión se recalcula al reconectar y explica qué hacer
+- [x] T025 Mejoras: lista de peticiones desde el teléfono (con voz) y el PC
+- [x] T026 Mejoras: Claude las hace una a una o todas, arma el paquete e instala; preguntas, cancelar y deshacer
+- [x] T027 Repositorio conectado: las actualizaciones de Eric se mezclan solas con los cambios de su Claude

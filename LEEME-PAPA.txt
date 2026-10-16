@@ -101,32 +101,37 @@ SI TU PC ES UNA LAPTOP SAMSUNG GALAXY BOOK
  - En el aviso del firewall elige "Permitir acceso" en redes privadas.
 
 
-CAMBIAR PC HUB CON TU PROPIO CLAUDE
------------------------------------
-Como ya usas Claude Code, puedes pedirle que cambie PC Hub por ti, sin saber
-programar (botones nuevos, otros colores, una función para tu Excel...).
-1. Clic derecho en el ícono de PC Hub (junto al reloj) -> "Mejorar PC Hub con
-   mi Claude…". (O abre "Mejorar PC Hub con Claude.bat" de la carpeta del paquete.)
-2. La primera vez prepara todo solo (el código queda en Documentos\PcHub-Codigo)
-   y te pide iniciar sesión con tu cuenta de Claude en el navegador. Si falta
-   algún programa (Git, Claude Code) lo instala; si pregunta algo, di que sí.
-3. Se abre Claude en una ventana negra. Pídele lo que quieras con tus palabras:
-   - "Agrega en la pantalla de Excel un botón para ordenar la columna de menor a mayor."
-   - "Quiero que en Inicio salga primero el botón del Asistente."
-   - "Ahora arma el paquete nuevo."
-   Claude sabe cómo está hecho PC Hub (lee las notas del proyecto) y te va
-   avisando en sencillo lo que hace.
-4. Cuando te diga que el paquete está listo, abre el PcHub.Agent.exe nuevo (acepta
-   "Sí") y en el teléfono abre la app y toca "Actualizar la app ahora".
-Tu PIN y tus teléfonos vinculados se conservan. Cada cambio queda guardado con
-su historial: si algo sale mal, dile a Claude "vuelve a como estaba antes".
+PEDIRLE MEJORAS A TU CLAUDE (desde el teléfono o el PC)
+-------------------------------------------------------
+Como ya usas Claude, puedes pedirle que cambie PC Hub por ti, sin programar.
+1. Teléfono: en Inicio toca "¿Quieres cambiar algo de PC Hub?" (o Módulos ->
+   Mejoras). PC: clic derecho en el ícono de PC Hub -> "Pedir una mejora a mi
+   Claude…".
+2. Escribe (o dicta con el micrófono) lo que quieres, por ejemplo:
+   - "En Excel, un botón para ordenar la columna de menor a mayor."
+   - "Que en Inicio salga primero el botón del Asistente."
+   Cada petición se agrega a una LISTA. Puedes agregar todas las que quieras.
+3. Cuando quieras, toca "Hacer esta" en una, o "Hacer todas" para que tu Claude
+   las haga una tras otra. Verás en vivo qué va haciendo. Si necesita saber
+   algo, te lo pregunta ahí mismo y tú le respondes.
+4. Al terminar arma solo la versión nueva y aparece "Instalar la versión nueva".
+   Tócalo: PC Hub se reinicia solo y, cuando el teléfono se reconecte, toca
+   "Actualizar la app ahora" en Inicio.
+5. Si una mejora no te gusta, tócala en la lista y elige "Deshacer esta mejora":
+   se quita y se arma una versión sin ella.
+La primera vez necesita que tu cuenta de Claude esté conectada (clic derecho en
+el ícono -> "Configurar asistente IA…" -> "Iniciar sesión con mi cuenta") y
+guarda el código en Documentos\PcHub-Codigo. Cada mejora usa un poco de tu
+plan de Claude. Para trabajar con Claude directamente (más libre), clic derecho
+-> "Abrir Claude con el código (avanzado)…".
 
 Cuando Eric te mande una versión nueva:
  - Instálala como siempre (el .exe nuevo y "Actualizar la app ahora").
- - Si habías hecho cambios con tu Claude, abre "Mejorar PC Hub con mi Claude…"
-   una vez: mezcla lo nuevo de Eric con tus cambios sin perder nada y, cuando
-   termine, dile "arma el paquete nuevo" para que tus cambios también queden
-   en el programa.
+ - Si habías pedido mejoras, PC Hub mezcla solo lo nuevo de Eric con tus cambios
+   sin perder nada (si chocan, tu Claude lo arregla) y deja lista una versión
+   con todo junto: te avisa y solo tienes que instalarla ("Pedir una mejora…"
+   -> "Instalar la versión nueva"). También puedes forzarlo con "Traer las
+   actualizaciones de Eric…".
 
 
 SI ALGO NO FUNCIONA

@@ -76,6 +76,12 @@ public sealed class TrayApp : ApplicationContext
         {
             await _hub.StartAsync();
             _statusItem.Text = $"Escuchando en {LocalIps()} : {_hub.Config.Port}";
+            // Si llegó una actualización de Eric, se mezcla sola con los cambios de su Claude (ver MejorasModule)
+            _ = System.Threading.Tasks.Task.Delay(TimeSpan.FromSeconds(40)).ContinueWith(_ =>
+            {
+                try { if (!_hub.Mejoras.Busy && _hub.Mejoras.AutoSyncPendiente()) _hub.Mejoras.Sync(); }
+                catch (Exception ex) { Log.Error("Mejoras: sincronización automática", ex); }
+            });
             if (Program.StartedWithWindows) return; // arranque silencioso
             _tray.ShowBalloonTip(4000, "PC Hub activo",
                 _hub.Config.Devices.Count == 0

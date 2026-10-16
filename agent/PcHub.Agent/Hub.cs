@@ -326,6 +326,7 @@ public sealed class Hub : IAsyncDisposable
         On("mejoras.run.start", p => Mejoras.Start(p["ids"] is JsonArray arr ? arr.Select(n => n?.ToString() ?? "").ToList() : null));
         On("mejoras.run.cancel", _ => Mejoras.Cancel());
         On("mejoras.run.clear", _ => { Mejoras.ClearError(); return Mejoras.StatusJson(); });
+        On("mejoras.sync", _ => Mejoras.Sync());
         On("mejoras.install", _ => Mejoras.Install());
         On("mejoras.undo", p => Mejoras.Undo(S(p, "id")));
 

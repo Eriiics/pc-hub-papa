@@ -20,7 +20,7 @@ public sealed class MejorasDialog : Form
     private readonly ListView _list;
     private readonly Label _state;
     private readonly TextBox _log;
-    private readonly Button _doOne, _doAll, _cancel, _install, _remove, _undo, _answer;
+    private readonly Button _doOne, _doAll, _cancel, _install, _remove, _undo, _answer, _sync;
     private readonly System.Windows.Forms.Timer _timer;
     private string _lastLog = "";
 
@@ -87,6 +87,8 @@ public sealed class MejorasDialog : Form
         _undo = new Button { Left = 488, Top = 378, Width = 100, Height = 32, Text = "Deshacer" };
         _remove = new Button { Left = 594, Top = 378, Width = 100, Height = 32, Text = "Quitar" };
         _install = new Button { Left = 14, Top = 416, Width = 300, Height = 36, Text = "Instalar la versión nueva", BackColor = Color.FromArgb(220, 240, 255) };
+        _sync = new Button { Left = 322, Top = 416, Width = 380, Height = 36, Text = "Traer las actualizaciones de Eric y juntarlas con mis cambios" };
+        _sync.Click += (_, _) => Run(() => _hub.Mejoras.Sync());
 
         _doOne.Click += (_, _) => Run(() => _hub.Mejoras.Start(new[] { Selected()!.Id }));
         _doAll.Click += (_, _) => Run(() => _hub.Mejoras.Start(null));
@@ -118,7 +120,7 @@ public sealed class MejorasDialog : Form
             Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom, BackColor = Color.White,
         };
 
-        Controls.AddRange(new Control[] { intro, _input, add, _list, _doOne, _doAll, _cancel, _answer, _undo, _remove, _install, _state, _log });
+        Controls.AddRange(new Control[] { intro, _input, add, _list, _doOne, _doAll, _cancel, _answer, _undo, _remove, _install, _sync, _state, _log });
         _timer = new System.Windows.Forms.Timer { Interval = 1200 };
         _timer.Tick += (_, _) => Refresh2();
         _timer.Start();
@@ -189,6 +191,7 @@ public sealed class MejorasDialog : Form
         _answer.Enabled = !busy && sel is { Status: "con_preguntas" };
         _undo.Enabled = !busy && sel is { Status: "lista" or "hecha" };
         _remove.Enabled = !busy && sel != null && sel.Status != "en_curso";
+        _sync.Enabled = !busy;
         _install.Enabled = !busy && _hub.Mejoras.StatusJson()["state"]!.ToString() == "listo";
     }
 
