@@ -9,12 +9,18 @@ Lo que necesitas: el PC con Windows y un teléfono Android, los dos conectados
 al MISMO Wi-Fi.
 
 
-LO MÁS FÁCIL: UN SOLO ARCHIVO
------------------------------
-Haz doble clic en "Instalar-PcHub.bat". Instala todo lo que hace falta, te pide
-iniciar sesión en GitHub y en Claude, instala PC Hub en el PC y te guía para
-poner la app en el teléfono. Si algún día cierras PC Hub, ábrelo escribiendo
-"PC Hub" en el buscador de Windows (o con el ícono del escritorio).
+LO MÁS FÁCIL: QUE TU CLAUDE LO INSTALE TODO
+-------------------------------------------
+1. Abre una terminal (clic derecho en el botón Inicio -> "Terminal" o "Windows
+   PowerShell"), escribe  claude  y pulsa Enter.
+2. Pégale esta frase:
+   Lee las instrucciones de https://raw.githubusercontent.com/Eriiics/pc-hub-papa/main/CONFIGURAR-CON-CLAUDE.md y haz todo lo que dicen.
+3. Contesta lo que te pregunte y acepta los permisos de Windows. Instala lo que
+   falta, descarga PC Hub, lo instala en el PC y te guía para poner la app en el
+   teléfono.
+Si cierras PC Hub, ábrelo escribiendo "PC Hub" en el buscador de Windows (o con
+el ícono del escritorio).
+(Otra opción: doble clic en "Instalar-PcHub.bat", que hace lo mismo sin Claude.)
 Si prefieres hacerlo a mano, sigue los pasos de abajo.
 
 
