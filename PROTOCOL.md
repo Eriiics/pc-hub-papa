@@ -94,9 +94,9 @@ El PIN de 6 dígitos aparece en el menú del ícono de bandeja. Tras 5 intentos 
 | `mejoras.delete` | `id` | — |
 | `mejoras.answer` | `id`, `answers` (respuesta a la pregunta de Claude) | la mejora (vuelve a `nueva`) |
 | `mejoras.run.start` | `ids?` (sin ids = todas las nuevas) | estado del trabajo |
-| `mejoras.run.status` | — | `state` (`libre` `trabajando` `compilando` `listo` `error`), `step`, `error`, `done`, `total`, `version` (si `listo`), `prueba`, `log` |
+| `mejoras.run.status` | — | `state` (`libre` `trabajando` `compilando` `listo` `error`), `step`, `error`, `done`, `total`, `version` (si `listo`), `prueba`, `behind` y `subjects` (cambios nuevos que hay en GitHub y sus títulos), `log` |
 | `mejoras.run.cancel` / `mejoras.run.clear` | — | estado (clear quita un error) |
-| `mejoras.sync` | — | estado: mezcla las actualizaciones de Eric (`PcHub-Codigo.bundle`) con el código de la persona y arma la versión combinada |
+| `mejoras.sync` | — | estado: trae los cambios nuevos del repositorio de GitHub (`git pull`), arma la versión y la instala |
 | `mejoras.install` | — | `installing`: abre el `PcHub.Agent.exe` nuevo con `--actualizar` (se instala sin preguntar y reinicia) |
 | `mejoras.undo` | `id` | estado: `git revert` de esa mejora y versión nueva sin ella |
 

@@ -45,11 +45,12 @@ La persona que te habla usa mucho Excel y Claude Code pero no programa. Explíca
 5. Abre tú mismo `PcHub-Paquete/PcHub-PC/PcHub.Agent.exe` (`Start-Process`) y dile que acepte la actualización con «Sí». Luego, en el teléfono (mismo Wi-Fi), que abra la app y toque «Actualizar la app ahora» en Inicio y «Instalar» en Android: la app descarga la APK desde el PC (`/apk`). Se conservan el PIN y los teléfonos vinculados. Si el aviso no sale, que use «Instalar la app en el teléfono…» del ícono del PC.
 
 **La lista de Mejoras (la persona te pide cambios desde la app):**
-- Las peticiones llegan por `MejorasModule` (agente) y se te piden una a una con un mensaje que dice qué hacer. Termina siempre con una línea «RESUMEN: …» en sencillo (o «PREGUNTAS: …» si no puedes avanzar sin saber algo) y NO subas `VERSION`, ni hagas commit, ni armes el paquete: lo hace el programa.
+- Las peticiones llegan por `MejorasModule` (agente) y se te piden una a una con un mensaje que dice qué hacer. Termina siempre con una línea «RESUMEN: …» en sencillo (o «PREGUNTAS: …» si no puedes avanzar sin saber algo) y NO subas `VERSION`, ni hagas commit/push, ni armes el paquete: lo hace el programa (que además sube todo a GitHub).
 
-**Cómo trabajar el código (rama y actualizaciones):**
-- Esta carpeta suele ser `Documentos\PcHub-Codigo`, un clon con la rama `papa`. Trabaja siempre en `papa` y guarda cada cambio terminado con `git add -A` + `git commit -m "<qué hiciste>"`; nunca reescribas el historial.
-- Eric (quien hizo PC Hub) manda actualizaciones por el archivo `PcHub-Codigo.bundle`. `Mejorar-PcHub.ps1` las mezcla en `papa` (`git merge`). Si hay conflictos, conserva lo que la persona pidió antes y también lo nuevo (en `VERSION` deja el número más alto) y cuéntale en sencillo qué decidiste.
+**Cómo trabajar el código (GitHub):**
+- Esta carpeta suele ser `Documentos\PcHub-Codigo`, un clon del repositorio de GitHub (rama `main`, remoto `origin`). Si falta configurar algo (programas, GitHub, repositorio), sigue `CONFIGURAR-CON-CLAUDE.md`.
+- **Cada cambio terminado se guarda y se sube:** `git add -A`, `git commit -m "<qué hiciste>"`, `git pull --no-rebase origin main` y `git push origin main`. Si hay conflictos, conserva lo de ambos lados (en `VERSION` deja el número más alto). Nunca reescribas el historial.
+- Otras personas (por ejemplo quien hizo PC Hub) también suben cambios al mismo repositorio; PC Hub avisa cuando hay algo nuevo y se actualiza con un toque.
 - Prueba sin riesgo con `./Probar-version.ps1`; si tocaste `ExcelModule.cs`, corre antes de armar el paquete `PcHub.Agent.exe --autoprueba-excel` (resultado en `%TEMP%\autoprueba-excel.txt`).
 
 **Reglas que no se rompen:**

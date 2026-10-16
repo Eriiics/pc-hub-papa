@@ -39,7 +39,7 @@ ACTUALIZAR (cuando haya una versión nueva)
     el botón "Actualizar la app ahora". Tócalo, espera la descarga y toca
     "Instalar" cuando Android lo pida. Nada de cables ni de pasar archivos.
     (La primera vez Android te pedirá dar permiso a PC Hub para instalar: actívalo.)
- Si Eric dejó vinculado tu teléfono por Wi-Fi (se hace una sola vez, ver más
+ Si tu teléfono quedó vinculado por Wi-Fi (se hace una sola vez, ver más
  abajo), la app se actualiza SOLA: el PC la instala por Wi-Fi y se vuelve a
  abrir, sin pedirte tocar "Instalar".
  No pierdes el PIN ni los teléfonos vinculados.
@@ -80,7 +80,7 @@ Después, en la pestaña "IA" del teléfono le puedes decir cosas como
 
 ACTUALIZAR SIN TOCAR NADA (se deja listo una sola vez)
 -----------------------------------------------------
-Esto lo configura Eric (o tú, si quieres) una vez:
+Esto se deja listo una sola vez:
 1. En el teléfono: Ajustes -> Acerca del teléfono -> Información de software ->
    toca 7 veces "Número de compilación". Luego Ajustes -> Opciones de
    desarrollador -> activa "Depuración inalámbrica" (mismo Wi-Fi que el PC).
@@ -121,6 +121,14 @@ SI TU PC ES UNA LAPTOP SAMSUNG GALAXY BOOK
 PEDIRLE MEJORAS A TU CLAUDE (desde el teléfono o el PC)
 -------------------------------------------------------
 Como ya usas Claude, puedes pedirle que cambie PC Hub por ti, sin programar.
+Los cambios se guardan en tu repositorio de GitHub, y de ahí se actualiza todo.
+
+PRIMERA VEZ (una sola vez): abre Claude Code y dile:
+   "Lee el archivo CONFIGURAR-CON-CLAUDE.md de la carpeta del paquete de PC Hub
+   y haz todo lo que dice."
+Él instala lo que falte, conecta tu cuenta de GitHub y deja todo listo.
+
+Después, para pedir un cambio:
 1. Teléfono: en Inicio toca "¿Quieres cambiar algo de PC Hub?" (o Módulos ->
    Mejoras). PC: clic derecho en el ícono de PC Hub -> "Pedir una mejora a mi
    Claude…".
@@ -131,24 +139,17 @@ Como ya usas Claude, puedes pedirle que cambie PC Hub por ti, sin programar.
 3. Cuando quieras, toca "Hacer esta" en una, o "Hacer todas" para que tu Claude
    las haga una tras otra. Verás en vivo qué va haciendo. Si necesita saber
    algo, te lo pregunta ahí mismo y tú le respondes.
-4. Al terminar arma solo la versión nueva y aparece "Instalar la versión nueva".
-   Tócalo: PC Hub se reinicia solo y, cuando el teléfono se reconecte, toca
-   "Actualizar la app ahora" en Inicio.
-5. Si una mejora no te gusta, tócala en la lista y elige "Deshacer esta mejora":
-   se quita y se arma una versión sin ella.
-La primera vez necesita que tu cuenta de Claude esté conectada (clic derecho en
-el ícono -> "Configurar asistente IA…" -> "Iniciar sesión con mi cuenta") y
-guarda el código en Documentos\PcHub-Codigo. Cada mejora usa un poco de tu
-plan de Claude. Para trabajar con Claude directamente (más libre), clic derecho
--> "Abrir Claude con el código (avanzado)…".
+4. Al terminar sube los cambios a GitHub, arma la versión nueva y aparece
+   "Instalar la versión nueva". Tócalo: PC Hub se reinicia solo y el teléfono se
+   actualiza (o toca "Actualizar la app ahora" en Inicio).
+5. Si una mejora no te gusta, tócala en la lista y elige "Deshacer esta mejora".
 
-Cuando Eric te mande una versión nueva:
- - Instálala como siempre (el .exe nuevo y "Actualizar la app ahora").
- - Si habías pedido mejoras, PC Hub mezcla solo lo nuevo de Eric con tus cambios
-   sin perder nada (si chocan, tu Claude lo arregla) y deja lista una versión
-   con todo junto: te avisa y solo tienes que instalarla ("Pedir una mejora…"
-   -> "Instalar la versión nueva"). También puedes forzarlo con "Traer las
-   actualizaciones de Eric…".
+Cuando alguien más suba un cambio a tu repositorio, en Inicio (y en el ícono del
+PC) te sale "Hay una actualización de tu repositorio": toca "Actualizar ahora" y
+se baja, se arma y se instala solo.
+Cada mejora usa un poco de tu plan de Claude. Para trabajar con Claude
+directamente (más libre): clic derecho en el ícono -> "Abrir Claude con el
+código (avanzado)…".
 
 
 SI ALGO NO FUNCIONA

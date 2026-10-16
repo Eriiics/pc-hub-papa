@@ -80,6 +80,7 @@ fun HomeScreen(nav: Nav) {
     ) {
         Spacer(Modifier.height(6.dp))
         VersionNotice()
+        RepoUpdateNotice(nav)
         AiBar(nav)
 
         Spacer(Modifier.height(14.dp))
@@ -98,6 +99,37 @@ fun HomeScreen(nav: Nav) {
             Text("Pídeselo a tu Claude: anota lo que quieres y él lo programa e instala.", style = MaterialTheme.typography.bodySmall, color = Neon.TextDim)
         }
         Spacer(Modifier.height(24.dp))
+    }
+}
+
+/** Hay cambios nuevos en el repositorio de GitHub: un toque para traerlos, armar la versión e instalarla. */
+@Composable
+private fun RepoUpdateNotice(nav: Nav) {
+    val scope = rememberCoroutineScope()
+    val run by Pc.mejorasRun.collectAsState()
+    val status by Pc.status.collectAsState()
+    LaunchedEffect(status) {
+        if (status != Pc.Status.Connected) return@LaunchedEffect
+        while (true) {
+            try { Pc.mejorasRun.value = Pc.call("mejoras.run.status") } catch (_: Exception) { }
+            delay(30_000)
+        }
+    }
+    val behind = run?.optInt("behind") ?: 0
+    val libre = run?.optString("state").let { it == "libre" || it == "listo" }
+    if (behind > 0 && libre) {
+        GlassCard(Modifier.fillMaxWidth().padding(bottom = 10.dp), glow = Neon.Lime) {
+            Text("Hay una actualización de tu repositorio", style = MaterialTheme.typography.titleSmall, color = Neon.Lime)
+            val subjects = run?.optJSONArray("subjects")
+            val resumen = if (subjects != null && subjects.length() > 0) (0 until subjects.length()).joinToString("
+") { "• " + subjects.optString(it) } else "$behind cambio(s) nuevo(s)"
+            Text(resumen, style = MaterialTheme.typography.bodySmall, color = Neon.Text)
+            Spacer(Modifier.height(8.dp))
+            NeonButton("Actualizar ahora", Modifier.fillMaxWidth(), accent = Neon.Lime) {
+                scope.pcCall("mejoras.sync", timeoutMs = 20_000) { nav.go(Screen.Mejoras) }
+            }
+            Text("Trae los cambios, arma la versión nueva y se instala sola (PC Hub se reinicia).", style = MaterialTheme.typography.bodySmall, color = Neon.TextFaint)
+        }
     }
 }
 

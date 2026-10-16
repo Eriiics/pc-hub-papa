@@ -18,3 +18,6 @@
 - [x] T027 Repositorio conectado: las actualizaciones de Eric se mezclan solas con los cambios de su Claude
 - [x] T028 Prueba 1.3.0: el teléfono tenía una app anterior sin Mejoras; se instala por QR (la actualización dentro de la app existe desde la 1.1.0)
 - [x] T029 Instalar y actualizar la app por depuración inalámbrica (adb en el paquete; automático; sin probar con teléfono real)
+- [x] T030 El mouse igual que el de Eric (valores afinados de su app como predeterminados)
+- [x] T031 Todo pasa por GitHub: las mejoras suben al repositorio y los cambios nuevos del repositorio salen como «Actualizar»
+- [x] T032 CONFIGURAR-CON-CLAUDE.md: su Claude instala y conecta todo

@@ -191,7 +191,7 @@ fun MejorasScreen() {
         if (!ocupado && estado != "listo") {
             item {
                 TextButton(onClick = { llamar("mejoras.sync", timeoutMs = 20_000) }) {
-                    Text("Traer las actualizaciones de Eric y juntarlas con mis cambios", color = Neon.TextDim)
+                    Text("Actualizar desde el repositorio", color = Neon.TextDim)
                 }
             }
         }

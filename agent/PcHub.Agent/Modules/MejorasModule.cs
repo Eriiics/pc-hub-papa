@@ -30,8 +30,8 @@ public sealed class Mejora
 
 /// <summary>
 /// Lista de mejoras que la persona le pide a su Claude (desde el teléfono o el PC) y quién las va haciendo:
-/// una a una o todas, con Claude Code en la carpeta del código (rama «papa»). Cada mejora queda en su propio commit
-/// de git; al final se sube la versión, se arma el paquete y se instala. Ver Mejorar-PcHub.ps1 y el README.
+/// una a una o todas, con Claude Code en la carpeta del código (rama main del repositorio de GitHub). Cada mejora queda en su propio commit
+/// de git que se sube al repositorio de GitHub (origin/main); al final se sube la versión, se arma el paquete y se instala.
 /// </summary>
 public sealed class MejorasModule
 {
@@ -60,7 +60,7 @@ public sealed class MejorasModule
             if (pend.Version != "" && Version.TryParse(pend.Version, out var pv) && Version.TryParse(Installer.Number, out var cur) && cur >= pv)
             {
                 foreach (var m in all.Where(m => m.Status == "lista")) { m.Status = "hecha"; changed = true; }
-                SaveEstado(new Estado { BundleVisto = pend.BundleVisto });
+                SaveEstado(new Estado());
             }
             if (changed) Save(all);
         }
@@ -75,8 +75,6 @@ public sealed class MejorasModule
     {
         public string Version { get; set; } = "";
         public string Exe { get; set; } = "";
-        /// <summary>Fecha (ticks UTC) del PcHub-Codigo.bundle que ya se mezcló con el código de la persona.</summary>
-        public long BundleVisto { get; set; }
     }
 
     private static Estado LoadEstado()
@@ -273,25 +271,16 @@ public sealed class MejorasModule
             ["total"] = _total,
             ["version"] = listo ? pend.Version : "",
             ["prueba"] = Program.PruebaMode,
+            ["behind"] = _behind,
+            ["subjects"] = new JsonArray(_subjects.Select(x => (JsonNode?)x).ToArray()),
             ["log"] = log,
         };
     }
 
-    /// <summary>Carpeta del código: Documentos\PcHub-Codigo (la prepara Mejorar-PcHub.ps1).</summary>
+    /// <summary>Carpeta del código: Documentos\PcHub-Codigo (la deja lista el archivo CONFIGURAR-CON-CLAUDE.md).</summary>
     public static string CodeFolder =>
         Environment.GetEnvironmentVariable("PCHUB_CARPETA_CODIGO") is { Length: > 0 } e ? e
         : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PcHub-Codigo");
-
-    private static string? FindScript()
-    {
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
-        for (int i = 0; i < 8 && dir != null; i++, dir = dir.Parent)
-        {
-            var p = Path.Combine(dir.FullName, "Mejorar-PcHub.ps1");
-            if (File.Exists(p)) return p;
-        }
-        return null;
-    }
 
     /// <summary>Empieza a trabajar. ids = esas mejoras; sin ids = todas las nuevas.</summary>
     public JsonObject Start(IEnumerable<string>? ids)
@@ -423,7 +412,7 @@ public sealed class MejorasModule
     private string PromptMejora(Mejora m)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("Eres el Claude Code de la persona que usa PC Hub (no programa). Estás en la carpeta del proyecto, en la rama «papa». Lee CLAUDE.md y sigue sus reglas al pie de la letra.");
+        sb.AppendLine("Eres el Claude Code de la persona que usa PC Hub (no programa). Estás en la carpeta del proyecto, en la rama main (conectada a GitHub). Lee CLAUDE.md y sigue sus reglas al pie de la letra.");
         sb.AppendLine("Haz SOLO esta mejora que pidió, completa y con cuidado (los textos que vea la persona, en español sencillo y con tuteo):");
         sb.AppendLine("\"\"\"");
         sb.AppendLine(m.Text);
@@ -445,51 +434,125 @@ Reglas de este trabajo:
 
     // ------------------------------------------------------------------ carpeta del código y git
 
+    private const string SinRepo =
+        "Falta conectar PC Hub con tu repositorio de GitHub. Pídele a tu Claude que siga el archivo CONFIGURAR-CON-CLAUDE.md (viene en el paquete): lo deja todo listo.";
+
+    /// <summary>Ejecuta git y devuelve (código de salida, salida).</summary>
+    private static async Task<(int code, string output)> GitRunAsync(string repo, CancellationToken ct, params string[] args)
+    {
+        var psi = new ProcessStartInfo("git")
+        {
+            UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true,
+            WorkingDirectory = repo, StandardOutputEncoding = Encoding.UTF8, StandardErrorEncoding = Encoding.UTF8,
+        };
+        foreach (var a in args) psi.ArgumentList.Add(a);
+        psi.Environment["GIT_TERMINAL_PROMPT"] = "0";
+        using var p = Process.Start(psi) ?? throw new Falla("No pude ejecutar git. ¿Está instalado Git?");
+        var o = p.StandardOutput.ReadToEndAsync();
+        var e = p.StandardError.ReadToEndAsync();
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        cts.CancelAfter(TimeSpan.FromMinutes(3));
+        try { await p.WaitForExitAsync(cts.Token); }
+        catch (OperationCanceledException) { try { p.Kill(true); } catch { } ct.ThrowIfCancellationRequested(); return (-1, "git tardó demasiado"); }
+        return (p.ExitCode, (await o) + (await e));
+    }
+
+    private static bool Fusionando(string repo) => File.Exists(Path.Combine(repo, ".git", "MERGE_HEAD"));
+
+    /// <summary>
+    /// Deja el código al día con GitHub: guarda lo que haya sin guardar, trae los cambios nuevos (git pull) y, si chocan
+    /// con los de la persona, Claude los junta. Sin internet sigue con lo que hay en el PC.
+    /// </summary>
     private async Task<string> EnsureCodeAsync(CancellationToken ct)
     {
         var repo = CodeFolder;
-        var script = FindScript();
-        if (script == null && !Directory.Exists(Path.Combine(repo, ".git")))
-            throw new Falla("No encuentro «Mejorar-PcHub.ps1» ni la carpeta del código. Vuelve a abrir PcHub.Agent.exe desde la carpeta del paquete y acepta actualizar.");
-        if (script != null)
+        if (!Directory.Exists(Path.Combine(repo, ".git"))) throw new Falla(SinRepo);
+        var (cr, remote) = await GitRunAsync(repo, ct, "remote", "get-url", "origin");
+        if (cr != 0 || remote.Trim().Length == 0) throw new Falla(SinRepo);
+
+        SetState("trabajando", "Revisando el repositorio…");
+        Emit("▶ Trayendo los cambios nuevos del repositorio…");
+        await GitRunAsync(repo, ct, "add", "-A");
+        await GitRunAsync(repo, ct, "commit", "--quiet", "-m", "Cambios guardados antes de actualizar");
+        var (pc, pout) = await GitRunAsync(repo, ct, "pull", "--no-rebase", "--no-edit", "origin", "main");
+        if (pc != 0)
         {
-            SetState("trabajando", "Preparando el código y trayendo las actualizaciones de Eric…");
-            Emit("▶ Preparando el código (y mezclando las actualizaciones de Eric con tus cambios)…");
-            var code = await PowerShellAsync(script, "-SoloActualizar", repo, ct);
-            if (code == 3)
+            if (Fusionando(repo))
             {
-                Emit("▶ Tus cambios y la actualización chocaron: Claude los junta…");
+                Emit("▶ Tus cambios y los nuevos tocaron las mismas líneas: Claude los junta…");
                 var exeC = AiModule.FindClaude(_hub.Config.Ai.ClaudeCodePath) ?? throw new Falla("No encontré Claude Code.");
                 var (ok, t) = await ClaudeAsync(exeC, repo,
-                    "Hay una mezcla de git a medias en esta carpeta (git merge con conflictos) porque llegó una actualización de PC Hub y chocó con los cambios de la persona. " +
-                    "Resuélvelos conservando LO QUE LA PERSONA PIDIÓ ANTES y también lo nuevo de la actualización (en VERSION deja el número más alto). Quita las marcas <<<<<<< ======= >>>>>>>. " +
+                    "Hay una mezcla de git a medias en esta carpeta (git pull con conflictos) porque llegaron cambios nuevos del repositorio y chocaron con los de la persona. " +
+                    "Resuélvelos conservando LO QUE LA PERSONA PIDIÓ ANTES y también lo nuevo (en VERSION deja el número más alto). Quita las marcas <<<<<<< ======= >>>>>>>. " +
                     "No hagas commit. Termina con «RESUMEN:» y una frase sencilla.", ct);
-                if (!ok) throw new Falla("No pude juntar tus cambios con la actualización: " + Corto(t, 300));
-                await GitAsync(repo, ct, "add", "-A");
-                await GitAsync(repo, ct, "commit", "--quiet", "-m", "Actualización recibida (conflictos resueltos)");
+                if (!ok) throw new Falla("No pude juntar los cambios nuevos con los tuyos: " + Corto(t, 300));
+                await GitRunAsync(repo, ct, "add", "-A");
+                await GitRunAsync(repo, ct, "commit", "--quiet", "-m", "Actualización del repositorio (conflictos resueltos)");
             }
-            else if (code != 0) throw new Falla("No pude preparar la carpeta del código (¿falta Git o internet?). Mira el registro en la carpeta de datos.");
+            else
+            {
+                // Sin internet, sin sesión de GitHub o repositorio vacío: se sigue con lo que hay en este PC
+                Emit("⚠ No pude traer cambios de GitHub (¿sin internet?). Sigo con lo que hay en este PC.");
+                Log.Info("git pull: " + Corto(pout, 300));
+            }
         }
         return repo;
     }
 
-    private async Task<int> PowerShellAsync(string script, string args, string repo, CancellationToken ct)
+    /// <summary>Sube los commits a GitHub (origin/main). Si no se puede, quedan guardados en el PC y se suben la próxima vez.</summary>
+    private async Task PushAsync(string repo, CancellationToken ct)
     {
-        var psi = new ProcessStartInfo("powershell.exe")
+        var (c, o) = await GitRunAsync(repo, ct, "push", "origin", "HEAD:main");
+        if (c == 0) { Emit("⬆ Cambios subidos a GitHub"); return; }
+        // Alguien subió algo mientras tanto: se trae y se vuelve a intentar
+        var (pc, _) = await GitRunAsync(repo, ct, "pull", "--no-rebase", "--no-edit", "origin", "main");
+        if (pc == 0)
         {
-            UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true,
-            StandardOutputEncoding = Encoding.UTF8,
-            Arguments = "-NoProfile -ExecutionPolicy Bypass -Command \"[Console]::OutputEncoding=[Text.Encoding]::UTF8; & '" + script.Replace("'", "''") + "' " + args + "; exit $LASTEXITCODE\"",
-        };
-        psi.Environment["PCHUB_CARPETA_CODIGO"] = repo;
-        using var p = new Process { StartInfo = psi };
-        p.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Emit(e.Data.Trim()); };
-        p.Start();
-        _proc = p;
-        p.BeginOutputReadLine();
-        p.BeginErrorReadLine();
-        await p.WaitForExitAsync(ct);
-        return p.ExitCode;
+            (c, o) = await GitRunAsync(repo, ct, "push", "origin", "HEAD:main");
+            if (c == 0) { Emit("⬆ Cambios subidos a GitHub"); return; }
+        }
+        Emit("⚠ No pude subir los cambios a GitHub (¿sin internet o sin sesión?). Quedan guardados en este PC y se subirán la próxima vez.");
+        Log.Info("git push: " + Corto(o, 300));
+    }
+
+    // ------------------------------------------------------------------ cambios nuevos en el repositorio
+
+    private volatile int _behind;
+    private volatile List<string> _subjects = new();
+    private System.Threading.Timer? _remoteTimer;
+
+    /// <summary>Revisa cada tanto si hay cambios nuevos en GitHub (git fetch) y avisa para actualizar.</summary>
+    public void StartRemoteWatch()
+    {
+        _remoteTimer ??= new System.Threading.Timer(_ => { _ = CheckRemoteAsync(); }, null, TimeSpan.FromSeconds(45), TimeSpan.FromMinutes(10));
+    }
+
+    public async Task CheckRemoteAsync()
+    {
+        try
+        {
+            var repo = CodeFolder;
+            if (Busy || !Directory.Exists(Path.Combine(repo, ".git"))) return;
+            var ct = CancellationToken.None;
+            if ((await GitRunAsync(repo, ct, "fetch", "--quiet", "origin", "main")).code != 0) return;
+            var (c, n) = await GitRunAsync(repo, ct, "rev-list", "--count", "HEAD..origin/main");
+            var behind = c == 0 && int.TryParse(n.Trim(), out var k) ? k : 0;
+            var subjects = new List<string>();
+            if (behind > 0)
+            {
+                var (_, log) = await GitRunAsync(repo, ct, "log", "--format=%s", "-n", "5", "HEAD..origin/main");
+                subjects = log.Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(x => Corto(x, 90)).ToList();
+            }
+            var before = _behind;
+            _behind = behind;
+            _subjects = subjects;
+            if (behind != before)
+            {
+                _hub.Broadcast("mejoras.run", StatusJson());
+                if (behind > 0) _hub.NotifyTray($"Hay {behind} cambio(s) nuevo(s) en tu repositorio. Toca «Actualizar» en la app o en «Pedir una mejora…».");
+            }
+        }
+        catch (Exception ex) { Log.Error("Mejoras: revisar el repositorio", ex); }
     }
 
     private static async Task<string> GitAsync(string repo, CancellationToken ct, params string[] args)
@@ -608,17 +671,24 @@ Reglas de este trabajo:
 
     // ------------------------------------------------------------------ compilar e instalar
 
-    private async Task BuildAsync(string repo, string claudeExe, CancellationToken ct)
+    private async Task BuildAsync(string repo, string claudeExe, CancellationToken ct, bool soloSiHaceFalta = false)
     {
         // Nueva versión: una más que la actual (o que la del código si ya es mayor)
         var vf = Path.Combine(repo, "VERSION");
         Version.TryParse(File.Exists(vf) ? File.ReadAllText(vf).Trim() : "0.0.0", out var codeV);
         Version.TryParse(Installer.Number, out var curV);
         var baseV = codeV != null && curV != null && codeV > curV ? codeV : curV ?? new Version(1, 0, 0);
-        var nueva = new Version(baseV.Major, baseV.Minor, Math.Max(0, baseV.Build) + 1).ToString();
-        await File.WriteAllTextAsync(vf, nueva + "\n", ct);
-        await GitAsync(repo, ct, "add", "-A");
-        await GitAsync(repo, ct, "commit", "--quiet", "-m", "Versión " + nueva);
+        // Si lo que llegó del repositorio ya trae una versión más nueva que la instalada, se usa tal cual
+        string nueva;
+        if (soloSiHaceFalta && codeV != null && curV != null && codeV > curV) nueva = codeV.ToString();
+        else
+        {
+            nueva = new Version(baseV.Major, baseV.Minor, Math.Max(0, baseV.Build) + 1).ToString();
+            await File.WriteAllTextAsync(vf, nueva + "\n", ct);
+            await GitAsync(repo, ct, "add", "-A");
+            await GitAsync(repo, ct, "commit", "--quiet", "-m", "Versión " + nueva);
+        }
+        await PushAsync(repo, ct);
 
         for (int intento = 1; intento <= 2; intento++)
         {
@@ -628,7 +698,7 @@ Reglas de este trabajo:
             var exe = Path.Combine(repo, "PcHub-Paquete", "PcHub-PC", "PcHub.Agent.exe");
             if (code == 0 && File.Exists(exe))
             {
-                SaveEstado(new Estado { Version = nueva, Exe = exe, BundleVisto = LoadEstado().BundleVisto });
+                SaveEstado(new Estado { Version = nueva, Exe = exe });
                 Emit($"✔ Versión {nueva} lista para instalar");
                 _error = "";
                 SetState("libre", "");
@@ -678,25 +748,10 @@ Reglas de este trabajo:
         return (p.ExitCode, tail);
     }
 
-    private static string? BundlePath()
-    {
-        var script = FindScript();
-        var b = script == null ? null : Path.Combine(Path.GetDirectoryName(script)!, "PcHub-Codigo.bundle");
-        return b != null && File.Exists(b) ? b : null;
-    }
-
     /// <summary>
-    /// ¿Llegó una actualización (PcHub-Codigo.bundle más nuevo que el último mezclado) y ya existe la carpeta del código?
-    /// Si sí, se mezcla con los cambios de su Claude y se arma la versión combinada, sin que la persona haga nada.
+    /// Actualiza desde GitHub: trae los cambios nuevos (los de quien sea), junta los de la persona, arma la versión
+    /// y la instala (PC Hub se reinicia y el teléfono se actualiza).
     /// </summary>
-    public bool AutoSyncPendiente()
-    {
-        var b = BundlePath();
-        return b != null && !Program.PruebaMode && Directory.Exists(Path.Combine(CodeFolder, ".git"))
-               && File.GetLastWriteTimeUtc(b).Ticks > LoadEstado().BundleVisto;
-    }
-
-    /// <summary>Mezcla las actualizaciones de Eric con el código de la persona; si algo cambió, arma la versión combinada.</summary>
     public JsonObject Sync()
     {
         if (Busy) throw new InvalidOperationException("Claude está trabajando. Espera a que termine.");
@@ -704,30 +759,28 @@ Reglas de este trabajo:
         var ct = _cts.Token;
         _error = ""; _done = 0; _total = 0;
         lock (_log) _log.Clear();
-        SetState("trabajando", "Revisando si llegó una actualización…");
+        SetState("trabajando", "Actualizando desde el repositorio…");
         _task = Task.Run(async () =>
         {
             try
             {
                 var repo = CodeFolder;
-                var antes = Directory.Exists(Path.Combine(repo, ".git")) ? (await GitAsync(repo, ct, "rev-parse", "HEAD")).Trim() : "";
+                var antes = Directory.Exists(Path.Combine(repo, ".git")) ? (await GitRunAsync(repo, ct, "rev-parse", "HEAD")).output.Trim() : "";
                 await EnsureCodeAsync(ct);
-                var despues = (await GitAsync(repo, ct, "rev-parse", "HEAD")).Trim();
-                var b = BundlePath();
-                var est = LoadEstado();
-                if (b != null) { est.BundleVisto = File.GetLastWriteTimeUtc(b).Ticks; SaveEstado(est); }
+                var despues = (await GitRunAsync(repo, ct, "rev-parse", "HEAD")).output.Trim();
+                _behind = 0; _subjects = new();
                 if (antes != despues)
                 {
                     var exe = AiModule.FindClaude(_hub.Config.Ai.ClaudeCodePath) ?? "";
-                    Emit("▶ La actualización de Eric se mezcló con tus cambios. Armando la versión combinada…");
-                    await BuildAsync(repo, exe, ct);
-                    _hub.NotifyTray("Llegó una actualización y ya se mezcló con tus cambios. Falta instalarla (Pedir una mejora… → Instalar).");
+                    Emit("▶ Cambios nuevos recibidos. Armando la versión…");
+                    await BuildAsync(repo, exe, ct, soloSiHaceFalta: true);
+                    if (!Program.PruebaMode && StatusJson()["state"]!.ToString() == "listo") Install();
                 }
-                else SetState("libre", "");
+                else { Emit("✔ Ya tienes todo al día."); SetState("libre", ""); }
             }
             catch (OperationCanceledException) { SetState("libre", ""); }
             catch (Falla f) { _error = f.Message; Emit("✖ " + f.Message); SetState("error", ""); }
-            catch (Exception ex) { Log.Error("Mejoras: sincronizar", ex); _error = "Hubo un error inesperado: " + ex.Message; SetState("error", ""); }
+            catch (Exception ex) { Log.Error("Mejoras: actualizar", ex); _error = "Hubo un error inesperado: " + ex.Message; SetState("error", ""); }
         });
         return StatusJson();
     }
@@ -776,7 +829,7 @@ Reglas de este trabajo:
                         var psi2 = new ProcessStartInfo("git") { UseShellExecute = false, CreateNoWindow = true, WorkingDirectory = repo };
                         psi2.ArgumentList.Add("revert"); psi2.ArgumentList.Add("--abort");
                         Process.Start(psi2)?.WaitForExit();
-                        throw new Falla("No pude deshacerla sola porque otros cambios dependen de ella. Pídele a Claude (Mejorar PC Hub con mi Claude…) que la quite.");
+                        throw new Falla("No pude deshacerla sola porque otros cambios dependen de ella. Pídele a Claude (menú del ícono → Abrir Claude con el código) que la quite.");
                     }
                 }
                 SetStatus(id, "descartada", "Deshecha.");

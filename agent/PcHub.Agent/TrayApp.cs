@@ -77,12 +77,8 @@ public sealed class TrayApp : ApplicationContext
         {
             await _hub.StartAsync();
             _statusItem.Text = $"Escuchando en {LocalIps()} : {_hub.Config.Port}";
-            // Si llegó una actualización de Eric, se mezcla sola con los cambios de su Claude (ver MejorasModule)
-            _ = System.Threading.Tasks.Task.Delay(TimeSpan.FromSeconds(40)).ContinueWith(_ =>
-            {
-                try { if (!_hub.Mejoras.Busy && _hub.Mejoras.AutoSyncPendiente()) _hub.Mejoras.Sync(); }
-                catch (Exception ex) { Log.Error("Mejoras: sincronización automática", ex); }
-            });
+            // Revisa cada tanto si hay cambios nuevos en el repositorio de GitHub y avisa para actualizar
+            _hub.Mejoras.StartRemoteWatch();
             if (Program.StartedWithWindows) return; // arranque silencioso
             _tray.ShowBalloonTip(4000, "PC Hub activo",
                 _hub.Config.Devices.Count == 0
@@ -170,17 +166,24 @@ public sealed class TrayApp : ApplicationContext
             _tray.ShowBalloonTip(2500, "PC Hub", "Asistente IA listo. Pruébalo desde el teléfono.", ToolTipIcon.Info);
     }
 
-    /// <summary>Abre "Mejorar PC Hub con Claude.bat" (junto al programa): Claude Code con el código, para cambiar la app.</summary>
+    /// <summary>Abre una ventana con Claude Code dentro de la carpeta del código (para trabajar directamente con él).</summary>
     private static void OpenImprove()
     {
-        var bat = System.IO.Path.Combine(AppContext.BaseDirectory, "Mejorar PC Hub con Claude.bat");
-        if (!System.IO.File.Exists(bat))
+        var carpeta = PcHub.Agent.Modules.MejorasModule.CodeFolder;
+        if (!System.IO.Directory.Exists(System.IO.Path.Combine(carpeta, ".git")))
         {
-            MessageBox.Show("No encuentro «Mejorar PC Hub con Claude.bat» junto al programa.\n\nVuelve a abrir PcHub.Agent.exe desde la carpeta del paquete y acepta actualizar.",
+            MessageBox.Show("Todavía no está conectado el repositorio de GitHub.
+
+Pídele a tu Claude que siga el archivo CONFIGURAR-CON-CLAUDE.md (viene en el paquete) y lo deja todo listo.",
                 "PC Hub", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(bat) { UseShellExecute = true, WorkingDirectory = AppContext.BaseDirectory });
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("powershell.exe")
+        {
+            UseShellExecute = true,
+            WorkingDirectory = carpeta,
+            Arguments = "-NoExit -NoProfile -Command \"claude\"",
+        });
     }
 
     private void ShowPin() =>

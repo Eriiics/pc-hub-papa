@@ -87,7 +87,7 @@ public sealed class MejorasDialog : Form
         _undo = new Button { Left = 488, Top = 378, Width = 100, Height = 32, Text = "Deshacer" };
         _remove = new Button { Left = 594, Top = 378, Width = 100, Height = 32, Text = "Quitar" };
         _install = new Button { Left = 14, Top = 416, Width = 300, Height = 36, Text = "Instalar la versión nueva", BackColor = Color.FromArgb(220, 240, 255) };
-        _sync = new Button { Left = 322, Top = 416, Width = 380, Height = 36, Text = "Traer las actualizaciones de Eric y juntarlas con mis cambios" };
+        _sync = new Button { Left = 322, Top = 416, Width = 380, Height = 36, Text = "Actualizar desde el repositorio" };
         _sync.Click += (_, _) => Run(() => _hub.Mejoras.Sync());
 
         _doOne.Click += (_, _) => Run(() => _hub.Mejoras.Start(new[] { Selected()!.Id }));
@@ -191,6 +191,8 @@ public sealed class MejorasDialog : Form
         _answer.Enabled = !busy && sel is { Status: "con_preguntas" };
         _undo.Enabled = !busy && sel is { Status: "lista" or "hecha" };
         _remove.Enabled = !busy && sel != null && sel.Status != "en_curso";
+        var behind = _hub.Mejoras.StatusJson()["behind"]?.GetValue<int>() ?? 0;
+        _sync.Text = behind > 0 ? $"Actualizar desde el repositorio ({behind} cambio(s) nuevo(s))" : "Actualizar desde el repositorio";
         _sync.Enabled = !busy;
         _install.Enabled = !busy && _hub.Mejoras.StatusJson()["state"]!.ToString() == "listo";
     }

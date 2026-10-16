@@ -20,22 +20,22 @@ object Prefs {
         autoSwitch = sp.getBoolean("autoSwitch", true)
         autoSwitchLocked = sp.getString("autoSwitchLocked", "")!!.split(',').filter { it.isNotBlank() }.toSet()
         sensitivity = sp.getFloat("sensitivity", 1.6f)
-        acceleration = sp.getFloat("acceleration", 1.0f)
+        acceleration = sp.getFloat("acceleration", 0.54f)
         scrollSpeed = sp.getFloat("scrollSpeed", 2.5f)
         naturalScroll = sp.getBoolean("naturalScroll", true)
         haptics = sp.getBoolean("haptics", true)
         pointerSensitivity = sp.getFloat("pointerSensitivity", 1500f)
         pointerUpright = sp.getBoolean("pointerUpright", false)
-        pointerAlwaysOn = sp.getBoolean("pointerAlwaysOn", false)
+        pointerAlwaysOn = sp.getBoolean("pointerAlwaysOn", true)
         pointerVolumeKeys = sp.getBoolean("pointerVolumeKeys", true)
         pointerMode = sp.getString("pointerMode", "air") ?: "air"
         pointerPrecision = sp.getFloat("pointerPrecision", 0.5f)
-        pointerSmoothing = sp.getFloat("pointerSmoothing", 0.5f)
-        pointerRange = sp.getFloat("pointerRange", 22f)
+        pointerSmoothing = sp.getFloat("pointerSmoothing", 0.28f)
+        pointerRange = sp.getFloat("pointerRange", 31.9f)
         neonIntensity = sp.getFloat("neonIntensity", 0.4f)
         terminalFont = sp.getInt("terminalFont", 12)
-        pointerMotionGestures = sp.getBoolean("pointerMotionGestures", false)
-        pointerPreview = sp.getBoolean("pointerPreview", false)
+        pointerMotionGestures = sp.getBoolean("pointerMotionGestures", true)
+        pointerPreview = sp.getBoolean("pointerPreview", true)
         favorites = sp.getString("favorites", "")!!.split(',').filter { it.isNotBlank() }.toSet()
         usage = parseUsage(sp.getString("usage", "{}")!!)
         shortcutsJson = sp.getString("shortcuts", "") ?: ""
@@ -107,7 +107,7 @@ object Prefs {
         get() = _sensitivity
         set(v) { _sensitivity = v; if (ready) sp.edit().putFloat("sensitivity", v).apply() }
 
-    private var _acceleration by mutableFloatStateOf(1.0f)
+    private var _acceleration by mutableFloatStateOf(0.54f)
     var acceleration: Float
         get() = _acceleration
         set(v) { _acceleration = v; if (ready) sp.edit().putFloat("acceleration", v).apply() }
@@ -135,7 +135,7 @@ object Prefs {
         get() = _pointerUpright
         set(v) { _pointerUpright = v; if (ready) sp.edit().putBoolean("pointerUpright", v).apply() }
 
-    private var _pointerAlwaysOn by mutableStateOf(false)
+    private var _pointerAlwaysOn by mutableStateOf(true)
     /** true = apunta siempre; false = solo mientras mantienes el botón B. */
     var pointerAlwaysOn: Boolean
         get() = _pointerAlwaysOn
@@ -159,13 +159,13 @@ object Prefs {
         get() = _pointerPrecision
         set(v) { _pointerPrecision = v; if (ready) sp.edit().putFloat("pointerPrecision", v).apply() }
 
-    private var _pointerSmoothing by mutableFloatStateOf(0.5f)
+    private var _pointerSmoothing by mutableFloatStateOf(0.28f)
     /** 0..1: filtro anti-temblor (más = más estable, un poco más de retraso al moverse lento). */
     var pointerSmoothing: Float
         get() = _pointerSmoothing
         set(v) { _pointerSmoothing = v; if (ready) sp.edit().putFloat("pointerSmoothing", v).apply() }
 
-    private var _pointerRange by mutableFloatStateOf(22f)
+    private var _pointerRange by mutableFloatStateOf(31.9f)
     /** Modo Wii: grados de giro desde el centro hasta el borde izquierdo/derecho de la pantalla. */
     var pointerRange: Float
         get() = _pointerRange
@@ -184,7 +184,7 @@ object Prefs {
         set(v) { field = v; if (ready) sp.edit().putInt("terminalFont", v).apply() }
 
     // --- Puntero: gestos con el movimiento ---
-    private var _pointerMotionGestures by mutableStateOf(false)
+    private var _pointerMotionGestures by mutableStateOf(true)
     /**
      * true = mantener A apunta aunque no tengas B (arrastrar moviendo el teléfono) y mantener el botón de scroll
      * desplaza inclinando el teléfono arriba/abajo.
@@ -193,7 +193,7 @@ object Prefs {
         get() = _pointerMotionGestures
         set(v) { _pointerMotionGestures = v; if (ready) sp.edit().putBoolean("pointerMotionGestures", v).apply() }
 
-    private var _pointerPreview by mutableStateOf(false)
+    private var _pointerPreview by mutableStateOf(true)
     /** Modo Wii: mostrar la mini pantalla con la posición del puntero. */
     var pointerPreview: Boolean
         get() = _pointerPreview
