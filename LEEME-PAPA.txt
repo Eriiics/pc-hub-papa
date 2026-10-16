@@ -39,6 +39,9 @@ ACTUALIZAR (cuando haya una versión nueva)
     el botón "Actualizar la app ahora". Tócalo, espera la descarga y toca
     "Instalar" cuando Android lo pida. Nada de cables ni de pasar archivos.
     (La primera vez Android te pedirá dar permiso a PC Hub para instalar: actívalo.)
+ Si Eric dejó vinculado tu teléfono por Wi-Fi (se hace una sola vez, ver más
+ abajo), la app se actualiza SOLA: el PC la instala por Wi-Fi y se vuelve a
+ abrir, sin pedirte tocar "Instalar".
  No pierdes el PIN ni los teléfonos vinculados.
  Si el aviso no sale, usa "Instalar la app en el teléfono…" (clic derecho en el
  ícono del PC) o pasa "PcHub.apk" a mano.
@@ -73,6 +76,20 @@ Como ya usas Claude Code, el asistente lo aprovecha sin pagar nada extra:
 2. Elige "Claude Code" y listo.
 Después, en la pestaña "IA" del teléfono le puedes decir cosas como
 "abre Excel y el archivo de ventas" o "sube el volumen".
+
+
+ACTUALIZAR SIN TOCAR NADA (se deja listo una sola vez)
+-----------------------------------------------------
+Esto lo configura Eric (o tú, si quieres) una vez:
+1. En el teléfono: Ajustes -> Acerca del teléfono -> Información de software ->
+   toca 7 veces "Número de compilación". Luego Ajustes -> Opciones de
+   desarrollador -> activa "Depuración inalámbrica" (mismo Wi-Fi que el PC).
+2. En el PC: clic derecho en el ícono de PC Hub -> "Instalar en el teléfono por
+   Wi-Fi (sin tocar nada)…". En el teléfono toca "Vincular dispositivo con código
+   de vinculación", escribe en el PC la dirección con puerto y el código, toca
+   "Vincular" y después "Instalar en el teléfono ahora".
+Desde ahí, cada versión nueva se instala sola por Wi-Fi. (En un Samsung,
+desactiva el "Bloqueador automático" si no deja.)
 
 
 SI TU TELÉFONO ES SAMSUNG GALAXY

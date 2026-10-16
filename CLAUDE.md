@@ -23,7 +23,7 @@ una persona que sabe usar el computador y el teléfono pero no programa. Usa muc
 
 FL Studio, OBS, el buzón de ideas, la compilación e instalación desde el PC (git/Gradle/adb) y las actualizaciones por GitHub.
 Se agregó el módulo de Excel (`Modules/ExcelModule.cs`, `ui/ExcelScreen.kt`), que controla el Excel abierto por COM.
-La APK se firma siempre con `android/pchub.keystore` (en git, a propósito) y su `versionCode` sale de `VERSION`: sube `VERSION` en cada entrega o Android no la instalará encima. Para actualizar la app: compilar de nuevo con `Crear-paquete.ps1`, abrir el `.exe` nuevo (el instalador reemplaza la versión anterior y deja la APK junto al programa) y en el teléfono tocar «Actualizar la app ahora» (`net/AppUpdater.kt`, descarga `/apk` del PC).
+La APK se firma siempre con `android/pchub.keystore` (en git, a propósito) y su `versionCode` sale de `VERSION`: sube `VERSION` en cada entrega o Android no la instalará encima. Para actualizar la app: compilar de nuevo con `Crear-paquete.ps1`, abrir el `.exe` nuevo (el instalador reemplaza la versión anterior y deja la APK junto al programa) y en el teléfono tocar «Actualizar la app ahora» (`net/AppUpdater.kt`, descarga `/apk` del PC). Si el teléfono está vinculado por depuración inalámbrica (`AdbTools.cs`, `net/WirelessDebug.kt`), esa actualización la hace el PC por adb sin tocar nada.
 
 ## Pruebas sin riesgo
 

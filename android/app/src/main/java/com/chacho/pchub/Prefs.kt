@@ -56,6 +56,11 @@ object Prefs {
         get() = sp.getString("token", "") ?: ""
         set(v) = sp.edit().putString("token", v).apply()
 
+    /** Última versión del PC para la que ya se intentó actualizar sola por Wi-Fi (para no repetir en bucle). */
+    var autoUpdateTried: String
+        get() = sp.getString("autoUpdateTried", "") ?: ""
+        set(v) = sp.edit().putString("autoUpdateTried", v).apply()
+
     var pcName: String
         get() = sp.getString("pcName", "") ?: ""
         set(v) = sp.edit().putString("pcName", v).apply()

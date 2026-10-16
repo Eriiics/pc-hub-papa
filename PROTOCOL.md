@@ -86,6 +86,8 @@ El PIN de 6 dígitos aparece en el menú del ícono de bandeja. Tras 5 intentos 
 | `excel.files` | — | `files: [{path,name,folder,modified}]` (Recientes, Documentos, Escritorio y Descargas) |
 | `excel.open` | `path` (.xlsx/.xlsm/.xls/.csv) | `opening` (false si Excel lo abrió por COM; `already` si ya estaba abierto y solo se mostró) |
 | `excel.new` | — | estado (abre Excel con un libro en blanco) |
+| `phone.install` | — | `ok`, `message`: el PC instala la app (la APK junto al programa) en el teléfono que lo pide, por depuración inalámbrica (adb); la app se reinicia sola |
+| `phone.adb` | — | `available`: ¿hay adb en el paquete o en el SDK? |
 | `mejoras.list` | — | `mejoras: [{id,text,status,note,commit,created,updated}]` (status: `nueva` `en_curso` `con_preguntas` `lista` `hecha` `con_problema` `descartada`) |
 | `mejoras.add` | `text` | la mejora |
 | `mejoras.update` | `id`, `text?`, `status?` | la mejora |

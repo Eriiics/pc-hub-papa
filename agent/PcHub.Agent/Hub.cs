@@ -316,6 +316,15 @@ public sealed class Hub : IAsyncDisposable
             return AppInfo();
         });
 
+        // Instalar la app en el teléfono por depuración inalámbrica (ver AdbTools): el teléfono lo pide y el PC se conecta por adb
+        On("phone.install", async (s, p) =>
+        {
+            var ip = s.Remote?.MapToIPv4().ToString();
+            var (ok, message) = await AdbTools.InstallAsync(ip);
+            return new JsonObject { ["ok"] = ok, ["message"] = message };
+        }, detached: true);
+        On("phone.adb", _ => new JsonObject { ["available"] = AdbTools.FindAdb() != null });
+
         // Mejoras: lista de peticiones para su Claude (ver MejorasModule)
         On("mejoras.list", _ => Mejoras.ListJson());
         On("mejoras.add", p => Mejoras.Add(S(p, "text")));

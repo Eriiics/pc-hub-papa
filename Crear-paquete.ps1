@@ -28,6 +28,13 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación de la app.' }
 } finally { Pop-Location }
 Copy-Item (Join-Path $raiz 'android\app\build\outputs\apk\release\app-release.apk') (Join-Path $salida 'PcHub.apk')
+# adb (3 archivos) dentro del programa del PC: así instala la app en el teléfono por Wi-Fi sin depender del SDK de Android
+$pt = Join-Path $sdk 'platform-tools'
+if ($sdk -and (Test-Path (Join-Path $pt 'adb.exe'))) {
+    $dest = Join-Path $salida 'PcHub-PC\herramientas\adb'
+    New-Item -ItemType Directory $dest -Force | Out-Null
+    foreach ($f in 'adb.exe', 'AdbWinApi.dll', 'AdbWinUsbApi.dll') { if (Test-Path (Join-Path $pt $f)) { Copy-Item (Join-Path $pt $f) $dest } }
+} else { Write-Host '  Aviso: no encontré adb en el SDK de Android; no se incluye en el paquete.' -ForegroundColor Yellow }
 # Copia dentro del programa del PC: así queda instalada y el ícono puede ofrecer la app al teléfono (QR)
 Copy-Item (Join-Path $salida 'PcHub.apk') (Join-Path $salida 'PcHub-PC\PcHub.apk')
 

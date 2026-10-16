@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import com.chacho.pchub.Prefs
 import com.chacho.pchub.net.AppUpdater
 import com.chacho.pchub.net.Pc
+import com.chacho.pchub.net.WirelessDebug
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -109,6 +110,30 @@ private fun VersionNotice() {
     var phoneIsOlder by remember { mutableStateOf(false) }
     var working by remember { mutableStateOf(false) }
     var problem by remember { mutableStateOf<String?>(null) }
+    var agentVersion by remember { mutableStateOf("") }
+
+    // Actualiza por Wi-Fi con el PC (adb, sin tocar nada); si no se puede, descarga la app y Android pide «Instalar»
+    fun actualizar(porWifi: Boolean) {
+        problem = null
+        working = true
+        scope.launch {
+            try {
+                if (porWifi) {
+                    val (ok, msg) = WirelessDebug.update(context)
+                    if (!ok) { problem = msg; working = false; return@launch }
+                } else if (!AppUpdater.canInstall(context)) {
+                    problem = "Android necesita que le des permiso a PC Hub para instalar. Actívalo en la pantalla que se abre y vuelve a tocar el botón."
+                    AppUpdater.askPermission(context)
+                } else {
+                    AppUpdater.downloadAndInstall(context)
+                }
+            } catch (e: Exception) {
+                problem = e.message ?: "No se pudo actualizar."
+            }
+            working = false
+        }
+    }
+
     val status by Pc.status.collectAsState()
     // Se vuelve a revisar al conectarse (por ejemplo después de actualizar el PC) y cada 20 segundos
     LaunchedEffect(status) {
@@ -129,6 +154,7 @@ private fun VersionNotice() {
                 }
                 val c = if (agent.isEmpty()) -1 else cmp(agent, app)
                 phoneIsOlder = c > 0
+                agentVersion = agent
                 message = when {
                     c > 0 -> "Hay una versión nueva de PC Hub: tu teléfono tiene la $app y el PC ya tiene la $agent."
                     c < 0 -> "El teléfono tiene la versión $app, pero el programa del PC es más antiguo (${agent.ifEmpty { "desconocida" }}). " +
@@ -138,6 +164,11 @@ private fun VersionNotice() {
             } catch (_: Exception) {
                 // Sin conexión: se conserva lo último que se supo
             }
+            // Con el teléfono ya vinculado al PC, se actualiza sola una vez por versión nueva
+            if (phoneIsOlder && !working && agentVersion.isNotEmpty() && WirelessDebug.ready(context) && Prefs.autoUpdateTried != agentVersion) {
+                Prefs.autoUpdateTried = agentVersion
+                actualizar(true)
+            }
             delay(20_000)
         }
     }
@@ -146,22 +177,19 @@ private fun VersionNotice() {
             Text("Hay una actualización pendiente", style = MaterialTheme.typography.titleSmall, color = Neon.Amber)
             Text(it, style = MaterialTheme.typography.bodySmall, color = Neon.Text)
             if (phoneIsOlder) {
+                val wifi = WirelessDebug.ready(context)
                 Spacer(Modifier.height(8.dp))
-                NeonButton(if (working) "Descargando…" else "Actualizar la app ahora", Modifier.fillMaxWidth(), enabled = !working) {
-                    problem = null
-                    if (!AppUpdater.canInstall(context)) {
-                        problem = "Android necesita que le des permiso a PC Hub para instalar. Actívalo en la pantalla que se abre y vuelve a tocar el botón."
-                        AppUpdater.askPermission(context)
-                    } else {
-                        working = true
-                        scope.launch {
-                            try { AppUpdater.downloadAndInstall(context) }
-                            catch (e: Exception) { problem = e.message ?: "No se pudo actualizar." }
-                            working = false
-                        }
+                NeonButton(if (working) "Actualizando…" else "Actualizar la app ahora", Modifier.fillMaxWidth(), enabled = !working) { actualizar(wifi) }
+                Text(
+                    if (wifi) "El PC la instala por Wi-Fi y la app se reinicia sola (no hay que tocar nada más)."
+                    else "Al terminar de descargar, Android te pedirá tocar «Instalar».",
+                    style = MaterialTheme.typography.bodySmall, color = Neon.TextFaint,
+                )
+                if (wifi) {
+                    TextButton(onClick = { actualizar(false) }, enabled = !working) {
+                        Text("Mejor descargarla e instalarla yo", color = Neon.TextDim)
                     }
                 }
-                Text("Al terminar de descargar, Android te pedirá tocar «Instalar».", style = MaterialTheme.typography.bodySmall, color = Neon.TextFaint)
             }
             problem?.let { p -> Text(p, style = MaterialTheme.typography.bodySmall, color = Neon.Amber) }
         }
