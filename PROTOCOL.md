@@ -96,6 +96,7 @@ El PIN de 6 dígitos aparece en el menú del ícono de bandeja. Tras 5 intentos 
 | `mejoras.run.start` | `ids?` (sin ids = todas las nuevas) | estado del trabajo |
 | `mejoras.run.status` | — | `state` (`libre` `trabajando` `compilando` `listo` `error`), `step`, `error`, `done`, `total`, `version` (si `listo`), `prueba`, `behind` y `subjects` (cambios nuevos que hay en GitHub y sus títulos), `log` |
 | `mejoras.run.cancel` / `mejoras.run.clear` | — | estado (clear quita un error) |
+| `mejoras.check` | — | estado: revisa ya si hay cambios nuevos en GitHub (`behind`, `subjects`); el agente también lo hace cada 10 minutos |
 | `mejoras.sync` | — | estado: trae los cambios nuevos del repositorio de GitHub (`git pull`), arma la versión y la instala |
 | `mejoras.install` | — | `installing`: abre el `PcHub.Agent.exe` nuevo con `--actualizar` (se instala sin preguntar y reinicia) |
 | `mejoras.undo` | `id` | estado: `git revert` de esa mejora y versión nueva sin ella |
