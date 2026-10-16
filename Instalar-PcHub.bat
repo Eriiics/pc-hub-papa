@@ -118,18 +118,26 @@ if (Tiene claude) {
 Paso 4 'GitHub y el código de PC Hub'
 gh auth status *> $null
 if ($LASTEXITCODE -ne 0) {
-    Info 'Inicia sesión en GitHub: aparecerá un código; pulsa Enter, se abre el navegador, escribe el código e inicia sesión con TU cuenta.'
-    gh auth login --hostname github.com --git-protocol https --web
+    Info 'Para que tus cambios se suban a GitHub hace falta una cuenta (gratis; si no tienes, créala en https://github.com/signup).'
+    $r = Read-Host '  ¿Conectar tu cuenta de GitHub ahora? Pulsa Enter para sí, o escribe N para hacerlo después'
+    if ($r -notmatch '^[nN]') {
+        Info 'Aparecerá un código; pulsa Enter, se abre el navegador, escribe el código e inicia sesión con TU cuenta.'
+        gh auth login --hostname github.com --git-protocol https --web
+    }
 }
 gh auth status *> $null
-if ($LASTEXITCODE -ne 0) { Parar 'No se pudo iniciar sesión en GitHub. Vuelve a abrir este archivo para reintentar.' }
-gh auth setup-git *> $null
-Ok 'GitHub conectado'
-if (-not (git config --global user.name)) {
-    $login = (gh api user --jq .login 2>$null)
-    $nombre = (gh api user --jq .name 2>$null); if (-not $nombre -or $nombre -eq 'null') { $nombre = $login }
-    $mail = (gh api user --jq .email 2>$null); if (-not $mail -or $mail -eq 'null') { $mail = "$login@users.noreply.github.com" }
-    git config --global user.name $nombre; git config --global user.email $mail
+if ($LASTEXITCODE -eq 0) {
+    gh auth setup-git *> $null
+    Ok 'GitHub conectado'
+    if (-not (git config --global user.name)) {
+        $login = (gh api user --jq .login 2>$null)
+        $nombre = (gh api user --jq .name 2>$null); if (-not $nombre -or $nombre -eq 'null') { $nombre = $login }
+        $mail = (gh api user --jq .email 2>$null); if (-not $mail -or $mail -eq 'null') { $mail = "$login@users.noreply.github.com" }
+        git config --global user.name $nombre; git config --global user.email $mail
+    }
+} else {
+    Aviso 'Sin cuenta de GitHub por ahora: PC Hub funciona igual, pero los cambios no se subirán hasta que la conectes (vuelve a abrir este archivo).'
+    if (-not (git config --global user.name)) { git config --global user.name 'PC Hub'; git config --global user.email 'pchub@example.com' }
 }
 git config --global pull.rebase false
 if (Test-Path (Join-Path $carpeta '.git')) {
@@ -140,7 +148,7 @@ if (Test-Path (Join-Path $carpeta '.git')) {
         Info "Descargando el código a $carpeta …"
         git clone $RepoUrl $carpeta 2>&1 | Out-Null
         if (Test-Path (Join-Path $carpeta '.git')) { break }
-        Aviso 'No pude descargar el código. Si es la primera vez, acepta la invitación al repositorio (te llegó por correo o en github.com/notifications) y vuelve a intentar.'
+        Aviso 'No pude descargar el código (¿hay internet? ¿el repositorio es privado y falta tu cuenta o la invitación?).'
         $r = Read-Host '  Pulsa Enter para reintentar (o escribe S para salir)'
         if ($r -match '^[sS]') { Parar 'Instalación detenida.' }
     }
