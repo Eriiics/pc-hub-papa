@@ -56,6 +56,20 @@ public sealed class HubServer : IAsyncDisposable
             }
 
             // La app del teléfono, para instalarla escaneando un QR (ver ApkShare). No contiene PIN ni datos de nadie.
+            // Página de instalación del QR: descarga la app y la conecta sin escribir PIN (clave de un solo uso en el QR)
+            if (ctx.Request.Path == "/instalar")
+            {
+                if (!ApkShare.SetupKeyValid(ctx.Request.Query["k"]))
+                {
+                    ctx.Response.StatusCode = 403;
+                    await ctx.Response.WriteAsync("Este enlace ya venció. Abre de nuevo «Instalar la app en el teléfono…» en el PC y escanea el código nuevo.");
+                    return;
+                }
+                ctx.Response.ContentType = "text/html; charset=utf-8";
+                await ctx.Response.WriteAsync(ApkShare.SetupPage(ctx.Request.Host.Host, port, hub.Pin));
+                return;
+            }
+
             if (ctx.Request.Path == "/apk")
             {
                 var apk = ApkShare.Find();

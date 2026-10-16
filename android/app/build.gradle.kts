@@ -21,6 +21,7 @@ android {
         versionCode = appVersionCode
         versionName = appVersion
         manifestPlaceholders["appLabel"] = "PC Hub"
+        manifestPlaceholders["deepLinkScheme"] = "pchub"
     }
 
     // Firma estable: la misma clave (android/pchub.keystore, va en el repositorio) en cualquier PC,
@@ -40,6 +41,7 @@ android {
             initWith(getByName("release"))
             applicationIdSuffix = ".prueba"
             manifestPlaceholders["appLabel"] = "PC Hub Prueba"
+            manifestPlaceholders["deepLinkScheme"] = "pchubprueba"
             signingConfig = signingConfigs.getByName("pchub")
             matchingFallbacks += "release"
         }

@@ -32,14 +32,24 @@ Copy-Item (Join-Path $raiz 'android\app\build\outputs\apk\release\app-release.ap
 Copy-Item (Join-Path $salida 'PcHub.apk') (Join-Path $salida 'PcHub-PC\PcHub.apk')
 
 Write-Host "3/3 Guardando el código fuente y las instrucciones…" -ForegroundColor Cyan
-# El código va dentro del paquete para poder cambiar y volver a armar la app con Claude Code.
-# git archive incluye solo lo guardado en git (sin carpetas compiladas).
+# El código va dentro del paquete como un "bundle" de git (todo el historial en un archivo) para que su Claude
+# lo use con Mejorar-PcHub.ps1 y las actualizaciones futuras se mezclen con sus cambios sin perderlos.
 if (Test-Path (Join-Path $raiz '.git')) {
-    if (git -C $raiz status --porcelain -- agent android PROTOCOL.md VERSION CLAUDE.md Crear-paquete.ps1) {
-        Write-Host "  Aviso: hay cambios sin guardar en git; el código fuente del paquete no los incluye." -ForegroundColor Yellow
+    if (git -C $raiz status --porcelain -- agent android PROTOCOL.md VERSION CLAUDE.md Crear-paquete.ps1 Mejorar-PcHub.ps1) {
+        Write-Host "  Aviso: hay cambios sin guardar en git; el código del paquete no los incluye (haz commit y vuelve a armar)." -ForegroundColor Yellow
     }
-    git -C $raiz archive --format=zip -o (Join-Path $salida 'PcHub-Codigo.zip') HEAD
+    # Solo desde la rama principal (quien arma las entregas); en la copia de su Claude (rama "papa") no hace falta
+    git -C $raiz rev-parse --verify --quiet main *> $null
+    if ($LASTEXITCODE -eq 0 -and (git -C $raiz branch --show-current).Trim() -eq 'main') {
+        git -C $raiz bundle create (Join-Path $salida 'PcHub-Codigo.bundle') main 2>&1 | Out-Null
+    }
 }
+Copy-Item (Join-Path $raiz 'Mejorar-PcHub.ps1') $salida
+Copy-Item (Join-Path $raiz 'Mejorar PC Hub con Claude.bat') $salida
+# También dentro del programa del PC: así queda instalado y el ícono puede abrirlo
+Copy-Item (Join-Path $raiz 'Mejorar-PcHub.ps1') (Join-Path $salida 'PcHub-PC')
+Copy-Item (Join-Path $raiz 'Mejorar PC Hub con Claude.bat') (Join-Path $salida 'PcHub-PC')
+if (Test-Path (Join-Path $salida 'PcHub-Codigo.bundle')) { Copy-Item (Join-Path $salida 'PcHub-Codigo.bundle') (Join-Path $salida 'PcHub-PC') }
 Copy-Item (Join-Path $raiz 'LEEME-PAPA.txt') (Join-Path $salida 'LEEME.txt')
 @"
 PC Hub ${version}: cómo actualizar (2 minutos)

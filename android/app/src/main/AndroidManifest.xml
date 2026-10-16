@@ -40,6 +40,13 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Enlace de la página de instalación del PC: abre la app y la conecta sin escribir el PIN -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="${deepLinkScheme}" android:host="conectar" />
+            </intent-filter>
         </activity>
 
         <!-- Compartir desde YouTube / YouTube Music → se reproduce en la pestaña abierta del PC -->

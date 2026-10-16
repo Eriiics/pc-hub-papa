@@ -19,6 +19,48 @@ public static class ApkShare
 {
     public static string FileName => Program.PruebaMode ? "PcHub-Prueba.apk" : "PcHub.apk";
 
+    /// <summary>Esquema del enlace que abre la app del teléfono ya emparejada (distinto en la app de prueba).</summary>
+    public static string Scheme => Program.PruebaMode ? "pchubprueba" : "pchub";
+
+    private static string? _setupKey;
+    private static DateTime _setupUntil;
+
+    /// <summary>Clave de un solo uso (vive 20 minutos) que va dentro del QR y abre la página de instalación con el PIN.</summary>
+    public static string NewSetupKey()
+    {
+        _setupKey = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(8)).ToLowerInvariant();
+        _setupUntil = DateTime.UtcNow.AddMinutes(20);
+        return _setupKey;
+    }
+
+    public static bool SetupKeyValid(string? key) =>
+        key != null && _setupKey != null && DateTime.UtcNow < _setupUntil &&
+        System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(
+            System.Text.Encoding.UTF8.GetBytes(key), System.Text.Encoding.UTF8.GetBytes(_setupKey));
+
+    /// <summary>
+    /// Página que ve el teléfono al escanear el QR: 1) descargar e instalar la app, 2) tocar «Conectar», que abre la app
+    /// ya emparejada con este PC (sin escribir IP ni PIN).
+    /// </summary>
+    public static string SetupPage(string host, int port, string pin)
+    {
+        var enlace = $"{Scheme}://conectar?host={Uri.EscapeDataString(host)}&port={port}&pin={Uri.EscapeDataString(pin)}";
+        var titulo = Program.PruebaMode ? "PC Hub (prueba)" : "PC Hub";
+        return $@"<!doctype html><html lang=""es""><head><meta charset=""utf-8""><meta name=""viewport"" content=""width=device-width,initial-scale=1"">
+<title>{titulo}</title>
+<style>body{{font-family:system-ui,sans-serif;background:#000;color:#fff;margin:0;padding:24px;max-width:480px;margin:auto}}
+h1{{font-size:26px}}p{{color:#bbb;line-height:1.4}}.paso{{background:#1c1c1e;border-radius:28px;padding:20px;margin:16px 0}}
+a.b{{display:block;text-align:center;background:#3e91ff;color:#fff;text-decoration:none;border-radius:999px;padding:16px;font-size:18px;margin-top:12px}}
+a.g{{background:#34c759}}small{{color:#888}}</style></head><body>
+<h1>{titulo}</h1>
+<div class=""paso""><b>Paso 1</b><p>Descarga la app y ábrela para instalarla. Si Android la bloquea, mira la sección Samsung del LEEME.</p>
+<a class=""b"" href=""/apk"">Descargar la app</a></div>
+<div class=""paso""><b>Paso 2</b><p>Cuando esté instalada, vuelve a esta página y toca el botón: la app se abre y queda conectada a este PC.</p>
+<a class=""b g"" href=""{enlace}"">Conectar con este PC</a></div>
+<p><small>Esta página solo funciona unos minutos mientras la ventana de instalación está abierta en el PC.</small></p>
+</body></html>";
+    }
+
     /// <summary>Busca la APK junto al programa, en la carpeta de arriba (paquete) o más arriba (código fuente).</summary>
     public static string? Find()
     {
@@ -66,7 +108,7 @@ public static class ApkShare
             return;
         }
 
-        var url = $"http://{ip}:{port}/apk";
+        var url = $"http://{ip}:{port}/instalar?k={NewSetupKey()}";
         using var generator = new QRCodeGenerator();
         using var data = generator.CreateQrCode(url, QRCodeGenerator.ECCLevel.M);
         var png = new PngByteQRCode(data).GetGraphic(12);
@@ -86,7 +128,7 @@ public static class ApkShare
         form.Controls.Add(new Label
         {
             Left = 20, Top = 16, Width = 400, Height = 108,
-            Text = "1. Conecta el teléfono al MISMO Wi-Fi que este PC.\r\n2. Abre la cámara y apunta al código.\r\n3. Toca el enlace, descarga el archivo y ábrelo para instalar.\r\n\r\nSi Android lo bloquea, mira la sección de Samsung en el LEEME.",
+            Text = "1. Conecta el teléfono al MISMO Wi-Fi que este PC.\r\n2. Abre la cámara y apunta al código.\r\n3. En la página que se abre: «Descargar la app», ábrela para instalar y después toca «Conectar con este PC».\r\n\r\nSi Android lo bloquea, mira la sección de Samsung en el LEEME.",
         });
         form.Controls.Add(new PictureBox
         {

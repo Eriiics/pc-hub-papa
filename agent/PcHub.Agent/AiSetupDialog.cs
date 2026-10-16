@@ -51,7 +51,7 @@ public sealed class AiSetupDialog : Form
 
         Text = "PC Hub — Asistente IA";
         Width = 600;
-        Height = 470;
+        Height = 520;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         MinimizeBox = false;
@@ -70,6 +70,18 @@ public sealed class AiSetupDialog : Form
         };
         y += 38;
         _codeStatus = new Label { Left = 34, Top = y, Width = 540, Height = 36, Text = "Revisando Claude Code…" };
+        y += 38;
+        _install = new Button { Text = "Instalar Claude Code", Left = 34, Top = y, Width = 190, Height = 30 };
+        _login = new Button { Text = "Iniciar sesión con mi cuenta", Left = 232, Top = y, Width = 220, Height = 30 };
+        _install.Click += async (_, _) => await RunVisibleAsync("Instalando Claude Code…",
+            "irm https://claude.ai/install.ps1 | iex; Write-Host ''; Write-Host 'Listo. Puedes cerrar esta ventana.' -ForegroundColor Green");
+        _login.Click += async (_, _) =>
+        {
+            var exe = AiModule.FindClaude(_config.Ai.ClaudeCodePath);
+            if (exe == null) { MessageBox.Show("Primero instala Claude Code con el botón de la izquierda.", "PC Hub"); return; }
+            await RunVisibleAsync("Iniciando sesión…",
+                $"& '{exe.Replace("'", "''")}' auth login --claudeai; Write-Host ''; Write-Host 'Listo. Puedes cerrar esta ventana.' -ForegroundColor Green");
+        };
         y += 38;
         var codeModelLabel = new Label { Left = 34, Top = y + 3, Width = 60, Text = "Modelo:", AutoSize = true };
         _codeModel = new ComboBox { Left = 100, Top = y, Width = 474, DropDownStyle = ComboBoxStyle.DropDownList };
@@ -111,19 +123,49 @@ public sealed class AiSetupDialog : Form
 
         Controls.AddRange(new Control[]
         {
-            _useCode, codeInfo, _codeStatus, codeModelLabel, _codeModel,
+            _useCode, codeInfo, _codeStatus, _install, _login, codeModelLabel, _codeModel,
             _useApi, keyLabel, _key, apiModelLabel, _apiModel,
             _result, _test, save, cancel,
         });
         AcceptButton = save;
         CancelButton = cancel;
 
-        Shown += async (_, _) =>
+        Shown += async (_, _) => await RefreshStatusAsync();
+    }
+
+    private readonly Button _install;
+    private readonly Button _login;
+
+    private async Task RefreshStatusAsync()
+    {
+        var (ok, message) = await AiModule.ClaudeCodeStatusAsync(_config.Ai.ClaudeCodePath);
+        _codeStatus.ForeColor = ok ? Color.FromArgb(20, 120, 70) : Color.Firebrick;
+        _codeStatus.Text = message;
+        bool instalado = AiModule.FindClaude(_config.Ai.ClaudeCodePath) != null;
+        _install.Visible = !instalado;
+        _login.Visible = instalado && !ok;
+        _login.Text = message.Contains("API key") ? "Cambiar a mi cuenta de claude.ai" : "Iniciar sesión con mi cuenta";
+    }
+
+    /// <summary>Abre una ventana de PowerShell visible con el comando, espera a que se cierre y vuelve a revisar el estado.</summary>
+    private async Task RunVisibleAsync(string title, string command)
+    {
+        _install.Enabled = _login.Enabled = false;
+        _codeStatus.ForeColor = Color.DimGray;
+        _codeStatus.Text = title + " Sigue las instrucciones de la ventana negra (el inicio de sesión se completa en el navegador) y ciérrala al terminar.";
+        try
         {
-            var (ok, message) = await AiModule.ClaudeCodeStatusAsync(_config.Ai.ClaudeCodePath);
-            _codeStatus.ForeColor = ok ? Color.FromArgb(20, 120, 70) : Color.Firebrick;
-            _codeStatus.Text = message;
-        };
+            var psi = new System.Diagnostics.ProcessStartInfo("powershell.exe")
+            {
+                UseShellExecute = true,
+                Arguments = "-NoProfile -ExecutionPolicy Bypass -Command \"" + command.Replace("\"", "\\\"") + "\"",
+            };
+            using var proc = System.Diagnostics.Process.Start(psi);
+            if (proc != null) await proc.WaitForExitAsync();
+        }
+        catch (Exception ex) { MessageBox.Show("No pude abrir la ventana: " + ex.Message, "PC Hub"); }
+        _install.Enabled = _login.Enabled = true;
+        await RefreshStatusAsync();
     }
 
     private static void FillModels(ComboBox box, ModelItem[] models, string current)

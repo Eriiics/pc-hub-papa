@@ -42,6 +42,7 @@ public sealed class TrayApp : ApplicationContext
         menu.Items.Add(_startupItem);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(new ToolStripMenuItem("Configurar asistente IA…", null, (_, _) => OpenAiSetup()));
+        menu.Items.Add(new ToolStripMenuItem("Mejorar PC Hub con mi Claude…", null, (_, _) => OpenImprove()));
         menu.Items.Add(new ToolStripMenuItem("Abrir configuración (config.json)", null, (_, _) => OpenConfig()));
         menu.Items.Add(new ToolStripMenuItem("Abrir carpeta de datos y log", null, (_, _) => Shell(ConfigStore.Folder)));
         menu.Items.Add(new ToolStripSeparator());
@@ -159,6 +160,19 @@ public sealed class TrayApp : ApplicationContext
         using var dlg = new AiSetupDialog(_hub.Config);
         if (dlg.ShowDialog() == DialogResult.OK)
             _tray.ShowBalloonTip(2500, "PC Hub", "Asistente IA listo. Pruébalo desde el teléfono.", ToolTipIcon.Info);
+    }
+
+    /// <summary>Abre "Mejorar PC Hub con Claude.bat" (junto al programa): Claude Code con el código, para cambiar la app.</summary>
+    private static void OpenImprove()
+    {
+        var bat = System.IO.Path.Combine(AppContext.BaseDirectory, "Mejorar PC Hub con Claude.bat");
+        if (!System.IO.File.Exists(bat))
+        {
+            MessageBox.Show("No encuentro «Mejorar PC Hub con Claude.bat» junto al programa.\n\nVuelve a abrir PcHub.Agent.exe desde la carpeta del paquete y acepta actualizar.",
+                "PC Hub", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(bat) { UseShellExecute = true, WorkingDirectory = AppContext.BaseDirectory });
     }
 
     private void ShowPin() =>

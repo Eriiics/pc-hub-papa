@@ -1,5 +1,6 @@
 package com.chacho.pchub
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
@@ -17,11 +18,29 @@ class MainActivity : ComponentActivity() {
         Prefs.init(applicationContext)
         Toaster.init(applicationContext)
         enableEdgeToEdge()
+        if (savedInstanceState == null) conectarDesdeEnlace(intent)
         setContent {
             PcHubTheme {
                 AppRoot()
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        conectarDesdeEnlace(intent)
+    }
+
+    /** Enlace de la página de instalación (pchub://conectar?host=…&port=…&pin=…): conecta y empareja solo. */
+    private fun conectarDesdeEnlace(intent: Intent?) {
+        val uri = intent?.data ?: return
+        if (uri.host != "conectar") return
+        val host = uri.getQueryParameter("host").orEmpty()
+        val pin = uri.getQueryParameter("pin").orEmpty()
+        val port = uri.getQueryParameter("port")?.toIntOrNull() ?: 47800
+        if (host.isEmpty() || pin.isEmpty()) return
+        Pc.connect(host, port, pin)
     }
 
     override fun onResume() {
