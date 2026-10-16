@@ -172,9 +172,7 @@ public sealed class TrayApp : ApplicationContext
         var carpeta = PcHub.Agent.Modules.MejorasModule.CodeFolder;
         if (!System.IO.Directory.Exists(System.IO.Path.Combine(carpeta, ".git")))
         {
-            MessageBox.Show("Todavía no está conectado el repositorio de GitHub.
-
-Pídele a tu Claude que siga el archivo CONFIGURAR-CON-CLAUDE.md (viene en el paquete) y lo deja todo listo.",
+            MessageBox.Show("Todavía no está conectado el repositorio de GitHub.\n\nPídele a tu Claude que siga el archivo CONFIGURAR-CON-CLAUDE.md (viene en el paquete) y lo deja todo listo.",
                 "PC Hub", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }

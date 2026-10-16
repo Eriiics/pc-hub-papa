@@ -121,8 +121,7 @@ private fun RepoUpdateNotice(nav: Nav) {
         GlassCard(Modifier.fillMaxWidth().padding(bottom = 10.dp), glow = Neon.Lime) {
             Text("Hay una actualización de tu repositorio", style = MaterialTheme.typography.titleSmall, color = Neon.Lime)
             val subjects = run?.optJSONArray("subjects")
-            val resumen = if (subjects != null && subjects.length() > 0) (0 until subjects.length()).joinToString("
-") { "• " + subjects.optString(it) } else "$behind cambio(s) nuevo(s)"
+            val resumen = if (subjects != null && subjects.length() > 0) (0 until subjects.length()).joinToString(System.lineSeparator()) { "• " + subjects.optString(it) } else "$behind cambio(s) nuevo(s)"
             Text(resumen, style = MaterialTheme.typography.bodySmall, color = Neon.Text)
             Spacer(Modifier.height(8.dp))
             NeonButton("Actualizar ahora", Modifier.fillMaxWidth(), accent = Neon.Lime) {
