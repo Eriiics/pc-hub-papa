@@ -16,3 +16,4 @@
 - [x] T025 Mejoras: lista de peticiones desde el teléfono (con voz) y el PC
 - [x] T026 Mejoras: Claude las hace una a una o todas, arma el paquete e instala; preguntas, cancelar y deshacer
 - [x] T027 Repositorio conectado: las actualizaciones de Eric se mezclan solas con los cambios de su Claude
+- [x] T028 Prueba 1.3.0: el teléfono tenía una app anterior sin Mejoras; se instala por QR (la actualización dentro de la app existe desde la 1.1.0)
