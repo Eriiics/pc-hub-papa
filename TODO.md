@@ -21,3 +21,4 @@
 - [x] T030 El mouse igual que el de Eric (valores afinados de su app como predeterminados)
 - [x] T031 Todo pasa por GitHub: las mejoras suben al repositorio y los cambios nuevos del repositorio salen como «Actualizar»
 - [x] T032 CONFIGURAR-CON-CLAUDE.md: su Claude instala y conecta todo
+- [x] T033 Instalador de un solo archivo (Instalar-PcHub.bat), ícono en el escritorio, Probar-version en Release (mouse)

@@ -31,6 +31,9 @@ Después, en el teléfono, Inicio muestra «Actualizar la app ahora»: descarga 
 
 ## Configuración inicial (una sola vez, cuando le dejas esto a otra persona)
 
+**Camino corto: `Instalar-PcHub.bat` (un solo archivo).** Pásaselo al PC de la persona (viene en el paquete y está en la raíz del repositorio; no necesita nada más) y que haga doble clic. Instala con `winget` Git, GitHub CLI, .NET 8 y Java 21; descarga el SDK de Android; instala Claude Code e inicia sesión; inicia sesión en GitHub y clona el repositorio en `Documentos\PcHub-Codigo`; arma PC Hub y la APK (`Crear-paquete.ps1`); instala PC Hub en el PC (queda en el menú Inicio como «PC Hub», con ícono en el escritorio, y se inicia con Windows) y abre la ventana para vincular el teléfono por Wi-Fi. Solo pide a la persona lo que es suyo (permisos de Windows, iniciar sesión en GitHub y Claude, el código del teléfono). Antes de usarlo, invita a su usuario al repositorio. El detalle queda en `%TEMP%\instalar-pchub.log`. Los pasos de abajo son lo mismo hecho a mano.
+
+
 1. **Repositorio de GitHub** (privado). Desde este proyecto, con `gh` ya iniciado en tu cuenta:
    `gh repo create <usuario>/pc-hub-papa --private --source . --remote papa --push` (sube `main`; el remoto queda con nombre `papa`), y para darle acceso: `gh api -X PUT repos/<usuario>/pc-hub-papa/collaborators/<su-usuario-de-github>`. Si prefieres que el repositorio sea de su cuenta, créalo allí y haz `git push <url> main`.
 2. Arma el paquete (`Crear-paquete.ps1`; haz commit antes) y abre `PcHub-PC\PcHub.Agent.exe` en el PC de él → «Sí» para instalar. Permite el firewall (redes privadas).

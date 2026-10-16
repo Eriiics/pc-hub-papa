@@ -9,6 +9,15 @@ Lo que necesitas: el PC con Windows y un teléfono Android, los dos conectados
 al MISMO Wi-Fi.
 
 
+LO MÁS FÁCIL: UN SOLO ARCHIVO
+-----------------------------
+Haz doble clic en "Instalar-PcHub.bat". Instala todo lo que hace falta, te pide
+iniciar sesión en GitHub y en Claude, instala PC Hub en el PC y te guía para
+poner la app en el teléfono. Si algún día cierras PC Hub, ábrelo escribiendo
+"PC Hub" en el buscador de Windows (o con el ícono del escritorio).
+Si prefieres hacerlo a mano, sigue los pasos de abajo.
+
+
 PASO 1: instalar en el PC (una sola vez)
 ----------------------------------------
 1. Abre la carpeta "PcHub-PC" y haz doble clic en "PcHub.Agent.exe".

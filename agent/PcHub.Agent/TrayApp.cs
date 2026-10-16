@@ -79,6 +79,8 @@ public sealed class TrayApp : ApplicationContext
             _statusItem.Text = $"Escuchando en {LocalIps()} : {_hub.Config.Port}";
             // Revisa cada tanto si hay cambios nuevos en el repositorio de GitHub y avisa para actualizar
             _hub.Mejoras.StartRemoteWatch();
+            // Instalador de un solo archivo: abre la ventana para vincular el teléfono e instalar la app por Wi-Fi
+            if (Environment.GetCommandLineArgs().Contains("--vincular", StringComparer.OrdinalIgnoreCase)) AdbDialog.ShowSingle();
             if (Program.StartedWithWindows) return; // arranque silencioso
             _tray.ShowBalloonTip(4000, "PC Hub activo",
                 _hub.Config.Devices.Count == 0

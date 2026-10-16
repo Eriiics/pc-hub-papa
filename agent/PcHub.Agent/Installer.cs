@@ -29,6 +29,9 @@ public static class Installer
 
     public static string InstalledExe => Path.Combine(InstallDir, ExeName);
 
+    private static string DesktopShortcut =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), AppName + ".lnk");
+
     private static string StartMenuShortcut =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), AppName + ".lnk");
 
@@ -57,9 +60,11 @@ public static class Installer
     {
         if (Program.PruebaMode || RunningFromInstall || !IsPublishedBuild) return false;
         var installed = InstalledVersion;
+        // --actualizar: lo abre el instalador de un solo archivo o PC Hub mismo; ya se decidió, no se vuelve a preguntar
+        bool sinPreguntarSiempre = Environment.GetCommandLineArgs().Contains("--actualizar", StringComparer.OrdinalIgnoreCase);
         if (installed == null)
         {
-            if (MessageBox.Show("¡Bienvenido a PC Hub!\n\n¿Quieres instalarlo en este PC? Quedará en el menú Inicio y se abrirá solo al encender el PC.",
+            if (!sinPreguntarSiempre && MessageBox.Show("¡Bienvenido a PC Hub!\n\n¿Quieres instalarlo en este PC? Quedará en el menú Inicio y se abrirá solo al encender el PC.",
                     AppName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return false;
             InstallFromCurrent();
             return true;
@@ -135,8 +140,11 @@ public static class Installer
                 CopyWithRetry(file, Path.Combine(InstallDir, rel));
             }
             CreateShortcut(StartMenuShortcut, InstalledExe, "Controla tu PC desde el teléfono");
+            try { CreateShortcut(DesktopShortcut, InstalledExe, "Controla tu PC desde el teléfono"); } catch { }
             SetStartup(true);
-            Process.Start(new ProcessStartInfo(InstalledExe) { UseShellExecute = true, WorkingDirectory = InstallDir });
+            // "--vincular" (instalador de un solo archivo) abre al arrancar la ventana para instalar la app por Wi-Fi
+            var vincular = Environment.GetCommandLineArgs().Contains("--vincular", StringComparer.OrdinalIgnoreCase);
+            Process.Start(new ProcessStartInfo(InstalledExe, vincular ? "--vincular" : "") { UseShellExecute = true, WorkingDirectory = InstallDir });
             Environment.Exit(0);
         }
         catch (Exception ex)
@@ -232,6 +240,7 @@ public static class Installer
 
         try { SetStartup(false); } catch { }
         try { File.Delete(StartMenuShortcut); } catch { }
+        try { File.Delete(DesktopShortcut); } catch { }
         try { Registry.CurrentUser.DeleteSubKeyTree(UninstallKey, false); } catch { }
 
         // Los archivos se borran después de que este proceso termine (están en uso)

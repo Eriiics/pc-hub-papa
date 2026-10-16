@@ -48,6 +48,7 @@ if (Test-Path (Join-Path $raiz '.git')) {
     git -C $raiz archive --format=zip -o (Join-Path $salida 'PcHub-Codigo.zip') HEAD
 }
 Copy-Item (Join-Path $raiz 'CONFIGURAR-CON-CLAUDE.md') $salida
+Copy-Item (Join-Path $raiz 'Instalar-PcHub.bat') $salida
 Copy-Item (Join-Path $raiz 'LEEME-PAPA.txt') (Join-Path $salida 'LEEME.txt')
 @"
 PC Hub ${version}: cómo actualizar (2 minutos)

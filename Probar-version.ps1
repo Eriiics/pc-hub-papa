@@ -24,11 +24,12 @@ if (-not $SinCompilar -or $Apk) { . (Join-Path $raiz 'Revisar-requisitos.ps1') }
 $proy = Join-Path $raiz 'agent\PcHub.Agent\PcHub.Agent.csproj'
 if (-not $SinCompilar) {
     Paso 'Compilando el programa del PC…'
-    dotnet build $proy -nologo -v q
+    dotnet build $proy -c Release -nologo -v q
     if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación del programa del PC.' }
 }
 $exe = Get-ChildItem (Join-Path $raiz 'agent\PcHub.Agent\bin') -Recurse -Filter PcHub.Agent.exe -ErrorAction SilentlyContinue |
-    Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    Sort-Object @{ Expression = { $_.FullName -like '*\Release\*' }; Descending = $true }, @{ Expression = 'LastWriteTime'; Descending = $true } |
+    Select-Object -First 1   # la compilación Release primero: la Debug es más lenta y el mouse se siente raro
 if (-not $exe) { throw 'No encuentro PcHub.Agent.exe compilado. Ejecuta sin -SinCompilar.' }
 
 if ($Apk) {
