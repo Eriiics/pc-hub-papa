@@ -44,6 +44,11 @@ La persona que te habla usa mucho Excel y Claude Code pero no programa. Explíca
 4. Ejecuta `./Crear-paquete.ps1 -SinAbrir`. Tarda unos minutos y deja `PcHub-Paquete/` y `PcHub-Paquete-<versión>.zip`.
 5. Abre tú mismo `PcHub-Paquete/PcHub-PC/PcHub.Agent.exe` (`Start-Process`) y dile que acepte la actualización con «Sí». Luego, en el teléfono (mismo Wi-Fi), que abra la app y toque «Actualizar la app ahora» en Inicio y «Instalar» en Android: la app descarga la APK desde el PC (`/apk`). Se conservan el PIN y los teléfonos vinculados. Si el aviso no sale, que use «Instalar la app en el teléfono…» del ícono del PC.
 
+**Cómo trabajar el código (rama y actualizaciones):**
+- Esta carpeta suele ser `Documentos\PcHub-Codigo`, un clon con la rama `papa`. Trabaja siempre en `papa` y guarda cada cambio terminado con `git add -A` + `git commit -m "<qué hiciste>"`; nunca reescribas el historial.
+- Eric (quien hizo PC Hub) manda actualizaciones por el archivo `PcHub-Codigo.bundle`. `Mejorar-PcHub.ps1` las mezcla en `papa` (`git merge`). Si hay conflictos, conserva lo que la persona pidió antes y también lo nuevo (en `VERSION` deja el número más alto) y cuéntale en sencillo qué decidiste.
+- Prueba sin riesgo con `./Probar-version.ps1`; si tocaste `ExcelModule.cs`, corre antes de armar el paquete `PcHub.Agent.exe --autoprueba-excel` (resultado en `%TEMP%\autoprueba-excel.txt`).
+
 **Reglas que no se rompen:**
 - No cambies versiones de Gradle, AGP, Kotlin ni de librerías, aunque haya avisos.
 - No borres `android/pchub.keystore`: con otra firma el teléfono rechaza la actualización.

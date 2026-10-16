@@ -23,10 +23,13 @@ PASO 2: instalar en el teléfono (una sola vez)
 ----------------------------------------------
 1. Lo más fácil: en el PC, clic derecho en el ícono de PC Hub (junto al reloj) ->
    "Instalar la app en el teléfono…" y escanea el código con la cámara del
-   teléfono. (O pasa el archivo "PcHub.apk" por cable, Drive, WhatsApp o correo.)
-2. Ábrelo desde el teléfono. Android pedirá permiso para "instalar apps
-   desconocidas": acéptalo solo para esa app (Archivos, Drive, etc.).
-3. Abre "PC Hub".
+   teléfono (mismo Wi-Fi). Se abre una página con dos botones:
+   - "Descargar la app": ábrela para instalarla. Android pedirá permiso para
+     "instalar apps desconocidas": acéptalo.
+   - "Conectar con este PC": vuelve a la página y tócalo. La app se abre ya
+     conectada, sin escribir IP ni PIN.
+   (Otra forma: pasa el archivo "PcHub.apk" por cable, Drive o WhatsApp y sigue
+   con el PASO 3.)
 
 ACTUALIZAR (cuando haya una versión nueva)
 -----------------------------------------
@@ -40,8 +43,8 @@ ACTUALIZAR (cuando haya una versión nueva)
  Si el aviso no sale, usa "Instalar la app en el teléfono…" (clic derecho en el
  ícono del PC) o pasa "PcHub.apk" a mano.
 
-PASO 3: conectar
-----------------
+PASO 3: conectar (solo si no usaste el botón "Conectar con este PC")
+---------------------------------------------------------------------
 1. La app busca tu PC sola. Tócalo en la lista.
    (Si no aparece, escribe la IP que sale al hacer doble clic en el ícono del PC.)
 2. Escribe el PIN de 6 números. Listo: no tendrás que hacerlo de nuevo.
@@ -100,25 +103,30 @@ SI TU PC ES UNA LAPTOP SAMSUNG GALAXY BOOK
 
 CAMBIAR PC HUB CON TU PROPIO CLAUDE
 -----------------------------------
-Dentro del paquete viene "PcHub-Codigo.zip": es el programa completo. Con tu
-Claude Code puedes pedirle que le agregue botones o cambie cosas, sin saber
-programar.
-1. Descomprime "PcHub-Codigo.zip" en una carpeta, por ejemplo en Documentos.
-2. Abre Claude Code en esa carpeta (en el Explorador: clic en la barra de la
-   dirección, escribe "powershell" y Enter; luego escribe "claude").
-3. Pídele lo que quieras con tus palabras. Por ejemplo:
+Como ya usas Claude Code, puedes pedirle que cambie PC Hub por ti, sin saber
+programar (botones nuevos, otros colores, una función para tu Excel...).
+1. Clic derecho en el ícono de PC Hub (junto al reloj) -> "Mejorar PC Hub con
+   mi Claude…". (O abre "Mejorar PC Hub con Claude.bat" de la carpeta del paquete.)
+2. La primera vez prepara todo solo (el código queda en Documentos\PcHub-Codigo)
+   y te pide iniciar sesión con tu cuenta de Claude en el navegador. Si falta
+   algún programa (Git, Claude Code) lo instala; si pregunta algo, di que sí.
+3. Se abre Claude en una ventana negra. Pídele lo que quieras con tus palabras:
    - "Agrega en la pantalla de Excel un botón para ordenar la columna de menor a mayor."
    - "Quiero que en Inicio salga primero el botón del Asistente."
-   - "Cambia el color de los botones a azul."
-   - "Ahora arma el paquete nuevo." (te dirá cuando esté listo y qué instalar)
-4. La primera vez te dirá si falta instalar algo (.NET, Java o Android).
-   Dile "instala lo que falte" y espera: puede tardar un rato.
-5. Cuando termine, instala el resultado igual que una actualización:
-   - PC: abre PcHub.Agent.exe (dentro de PcHub-PC, en la carpeta PcHub-Paquete
-     nueva) y elige "Sí".
-   - Teléfono: abre la app y toca "Actualizar la app ahora" en Inicio.
-Tu PIN y tus teléfonos vinculados se conservan. Si algo sale mal, dile a Claude
-"vuelve a como estaba antes" y vuelve a armar el paquete.
+   - "Ahora arma el paquete nuevo."
+   Claude sabe cómo está hecho PC Hub (lee las notas del proyecto) y te va
+   avisando en sencillo lo que hace.
+4. Cuando te diga que el paquete está listo, abre el PcHub.Agent.exe nuevo (acepta
+   "Sí") y en el teléfono abre la app y toca "Actualizar la app ahora".
+Tu PIN y tus teléfonos vinculados se conservan. Cada cambio queda guardado con
+su historial: si algo sale mal, dile a Claude "vuelve a como estaba antes".
+
+Cuando Eric te mande una versión nueva:
+ - Instálala como siempre (el .exe nuevo y "Actualizar la app ahora").
+ - Si habías hecho cambios con tu Claude, abre "Mejorar PC Hub con mi Claude…"
+   una vez: mezcla lo nuevo de Eric con tus cambios sin perder nada y, cuando
+   termine, dile "arma el paquete nuevo" para que tus cambios también queden
+   en el programa.
 
 
 SI ALGO NO FUNCIONA
